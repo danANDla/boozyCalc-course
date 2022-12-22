@@ -13,7 +13,7 @@ public class ProductService {
     @Autowired
     ProductRepo productRepo;
 
-    public ArrayList<ProductEntity> getAllIngredients() {
+    public ArrayList<ProductEntity> getAllProducts() {
         ArrayList<ProductEntity> list = (ArrayList<ProductEntity>) productRepo.findAll();
         return list;
     }
