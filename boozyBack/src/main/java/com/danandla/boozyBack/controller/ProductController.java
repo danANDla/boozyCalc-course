@@ -20,7 +20,7 @@ public class ProductController {
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity getProducts() {
         try {
-            return ResponseEntity.ok(productService.getAllIngredients());
+            return ResponseEntity.ok(productService.getAllProducts());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
         }
