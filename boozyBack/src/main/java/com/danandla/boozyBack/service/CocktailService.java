@@ -3,6 +3,7 @@ package com.danandla.boozyBack.service;
 import com.danandla.boozyBack.entity.CocktailEntity;
 import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
+import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.model.CocktailModel;
 import com.danandla.boozyBack.model.WeightedIngredientModel;
@@ -49,5 +50,14 @@ public class CocktailService {
             recipeRepo.save(recipeEntity);
         }
         return saved;
+    }
+
+    public Long deleteById(Long cocktailId) throws ItemNameNotFoundException {
+        CocktailEntity t = cocktailRepo.findById(cocktailId).get();
+        if (t != null) {
+            cocktailRepo.deleteById(cocktailId);
+            return cocktailId;
+        }
+        else throw new ItemNameNotFoundException("cocktail with this id wasn't found");
     }
 }
