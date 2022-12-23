@@ -6,19 +6,31 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "purchases")
+@IdClass(PurchaseId.class)
 public class PurchaseEntity implements  Serializable{
-    @EmbeddedId PurchaseKey id;
+    @Id
+    private Long product_id;
+    @Id
+    private Long party_id;
     private float quantity;
 
     public PurchaseEntity() {
     }
 
-    public PurchaseKey getId() {
-        return id;
+    public Long getProduct_id() {
+        return product_id;
     }
 
-    public void setId(PurchaseKey id) {
-        this.id = id;
+    public void setProduct_id(Long product_id) {
+        this.product_id = product_id;
+    }
+
+    public Long getParty_id() {
+        return party_id;
+    }
+
+    public void setParty_id(Long party_id) {
+        this.party_id = party_id;
     }
 
     public float getQuantity() {
@@ -28,10 +40,4 @@ public class PurchaseEntity implements  Serializable{
     public void setQuantity(float quantity) {
         this.quantity = quantity;
     }
-}
-
-@Embeddable
-class PurchaseKey implements Serializable {
-    private Long product_id;
-    private Long party_id;
 }
