@@ -1,29 +1,15 @@
-package com.danandla.boozyBack.entity;
+package com.danandla.boozyBack.model;
 
-import jakarta.persistence.*;
 
 import java.util.List;
 
-@Entity
-@Table(name = "cocktails")
-public class CocktailEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CocktailModel {
     private Long id;
     private String name;
     private String description;
     private String recipe;
     private Long type_id;
-
-    public CocktailEntity() {
-    }
-
-    public CocktailEntity(String name, String description, String recipe, Long type_id) {
-        this.name = name;
-        this.description = description;
-        this.recipe = recipe;
-        this.type_id = type_id;
-    }
+    private List<WeightedIngredientModel> ingredients;
 
     public Long getId() {
         return id;
@@ -63,5 +49,13 @@ public class CocktailEntity {
 
     public void setType_id(Long type_id) {
         this.type_id = type_id;
+    }
+
+    public List<WeightedIngredientModel> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<WeightedIngredientModel> ingredients) {
+        this.ingredients = ingredients;
     }
 }

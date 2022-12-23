@@ -17,6 +17,12 @@ public class RecipeEntity implements Serializable {
     public RecipeEntity() {
     }
 
+    public RecipeEntity(Long ingredient_id, Long cocktail_id, float quantity) {
+        this.ingredient_id = ingredient_id;
+        this.cocktail_id = cocktail_id;
+        this.quantity = quantity;
+    }
+
     public Long getIngredient_id() {
         return ingredient_id;
     }
