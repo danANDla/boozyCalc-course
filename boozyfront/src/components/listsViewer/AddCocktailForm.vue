@@ -67,10 +67,6 @@ export default {
   methods:{
     submitData(){
       this.$emit('submitData', this.cocktail)
-      this.ingredient = {
-        name: '',
-        description: ''
-      }
     },
 
   }

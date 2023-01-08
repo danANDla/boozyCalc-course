@@ -52,10 +52,6 @@ export default {
   methods:{
     submitData(){
       this.$emit('submitData', this.ingredient)
-      this.ingredient = {
-        name: '',
-        description: ''
-      }
     },
 
   }
