@@ -2,9 +2,9 @@
   <dialog-window v-model:show="ingrsDialogVisible">
     <div class="form-container">
       <add-ingredient-form @submitData="sendIngredient"
-                           @input="this.ingrAddIsError = false; this.ingrAddErrorText=''"
-                           :is-error="ingrAddIsError"
-                           :error-text="ingrAddErrorText">
+                           @input="this.ingredientsAddIsError = false; this.ingredientsAddErrorText=''"
+                           :is-error="ingredientsAddIsError"
+                           :error-text="ingredientsAddErrorText">
       </add-ingredient-form>
     </div>
   </dialog-window>
@@ -117,8 +117,8 @@ export default {
       ingrsSureVisible: false,
       ingrSureName: String,
       ingrSureId: Number,
-      ingrAddIsError: false,
-      ingrAddErrorText: "",
+      ingredientsAddIsError: false,
+      ingredientsAddErrorText: "",
 
       cocksSureVisible: false,
       cocksDialogVisible: false,
@@ -206,38 +206,46 @@ export default {
       }
     },
     showIngredientsDialog(id) {
-      this.ingrAddIsError = false
-      this.ingrAddErrorText = ""
+      this.ingredientsAddIsError = false
+      this.ingredientsAddErrorText = ""
       this.ingrsDialogVisible = true
     },
     async sendIngredient(newIngredient) {
       let status = false
       let errorText = ""
-      await axios.post(this.api_url + 'ingredients/add', newIngredient)
-          .then(function (response) {
-            status = true;
-            console.log(response.status.valueOf())
-          })
-          .catch(function (error) {
-            if (error.response) {
-              // Request made and server responded
-              console.log(error.response.data);
-              errorText = error.response.data
-            } else if (error.request) {
-              // The request was made but no response was received
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              console.log('Error', error.message);
-            }
-          })
-      if (status === true) {
-        await this.fetchIngredients()
-        this.ingrsDialogVisible = false
-      } else {
-        console.log("is Error")
-        this.ingrAddIsError = true
-        this.ingrAddErrorText = errorText
+      let badNewItem = false
+      if (newIngredient.name === "") {
+        this.ingredientsAddIsError = true
+        badNewItem = true
+        this.ingredientsAddErrorText = "empty name field"
+      }
+      if(!badNewItem){
+        await axios.post(this.api_url + 'ingredients/add', newIngredient)
+            .then(function (response) {
+              status = true;
+              console.log(response.status.valueOf())
+            })
+            .catch(function (error) {
+              if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                errorText = error.response.data
+              } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+            })
+        if (status === true) {
+          await this.fetchIngredients()
+          this.ingrsDialogVisible = false
+        } else {
+          console.log("is Error")
+          this.ingrAddIsError = true
+          this.ingrAddErrorText = errorText
+        }
       }
     },
     showSureIngredient(id, name) {
