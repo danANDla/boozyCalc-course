@@ -39,7 +39,8 @@
       <add-product-form @submitData="sendProduct"
                          @input="this.productsAddIsError = false; this.productsAddErrorText=''"
                          :is-error="productsAddIsError"
-                         :error-text="productsAddErrorText">
+                         :error-text="productsAddErrorText"
+                         :ingredients="ingredients">
       </add-product-form>
     </div>
   </dialog-window>
@@ -68,7 +69,7 @@
                           @deleteItem="showSureCocktail"></typed-item-section>
     </div>
     <div v-else>
-      <typed-item-section v-bind:items="products" type-name="" @addItem="showProductssDialog"
+      <typed-item-section v-bind:items="products" type-name="" @addItem="showProductsDialog"
                           @deleteItem="showSureProduct"></typed-item-section>
     </div>
   </div>
@@ -179,7 +180,7 @@ export default {
         this.deleteProduct(id)
         this.productsSureVisible = false
         this.productsSureId = -1
-        this.pdouctsrSureName = ""
+        this.productsSureName = ""
       }
       else {
         console.log(type + ' ' + id)
@@ -271,7 +272,6 @@ export default {
         }
       }
       if (newCocktail.name === "") {
-
         this.cocksAddIsError = true
         badNewItem = true
         this.cocksAddErrorText = "empty name field"
@@ -327,31 +327,44 @@ export default {
     async sendProduct(newProduct) {
       let status = false
       let errorText = ""
-      await axios.post(this.api_url + 'products/add', newProduct)
-          .then(function (response) {
-            status = true;
-            console.log(response.status.valueOf())
-          })
-          .catch(function (error) {
-            if (error.response) {
-              // Request made and server responded
-              console.log(error.response.data);
-              errorText = error.response.data
-            } else if (error.request) {
-              // The request was made but no response was received
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-              console.log('Error', error.message);
-            }
-          })
-      if (status === true) {
-        await this.fetchProducts()
-        this.productssDialogVisible = false
-      } else {
-        console.log("is Error")
+      let badNewItem = false
+      if (newProduct.price <= 0 || newProduct.ingredientId === -1) {
         this.productsAddIsError = true
-        this.productsAddErrorText = errorText
+        badNewItem = true
+        this.productsAddErrorText = "bad ingredient pick"
+      }
+      if (newProduct.name === "") {
+        this.productsAddIsError = true
+        badNewItem = true
+        this.productsAddErrorText = "empty name field"
+      }
+      if(!badNewItem){
+        await axios.post(this.api_url + 'products/add', newProduct)
+            .then(function (response) {
+              status = true;
+              console.log(response.status.valueOf())
+            })
+            .catch(function (error) {
+              if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                errorText = error.response.data
+              } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+            })
+        if (status === true) {
+          await this.fetchProducts()
+          this.productsDialogVisible = false
+        } else {
+          console.log("is Error")
+          this.productsAddIsError = true
+          this.productsAddErrorText = errorText
+        }
       }
     },
     showSureProduct(id, name) {
