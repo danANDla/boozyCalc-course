@@ -34,10 +34,27 @@
     </div>
   </dialog-window>
 
+  <dialog-window v-model:show="productsDialogVisible">
+    <div class="form-container">
+      <add-product-form @submitData="sendProduct"
+                         @input="this.productsAddIsError = false; this.productsAddErrorText=''"
+                         :is-error="productsAddIsError"
+                         :error-text="productsAddErrorText">
+      </add-product-form>
+    </div>
+  </dialog-window>
+  <dialog-window v-model:show="productsSureVisible">
+    <div class="form-container">
+      <are-you-sure @sure="sure('products', productsSureId)" @notsure="notsure('products')"> Are you sure you want to delete
+        {{ productsSureName }}?
+      </are-you-sure>
+    </div>
+  </dialog-window>
+
   <div class="list-container">
     <div>
       <my-tabz
-          :data="['Cocktails', 'Ingredients']"
+          :data="['Cocktails', 'Ingredients', 'Products']"
           main-color="#CFE5EE"
           @clickedTab="tabsHandler"
       />
@@ -46,9 +63,13 @@
       <typed-item-section v-bind:items="ingredients" type-name="" @addItem="showIngredientsDialog"
                           @deleteItem="showSureIngredient"></typed-item-section>
     </div>
-    <div v-else>
+    <div v-else-if="page==='cocktails'">
       <typed-item-section v-bind:items="cocktails" type-name="" @addItem="showCocktailsDialog"
                           @deleteItem="showSureCocktail"></typed-item-section>
+    </div>
+    <div v-else>
+      <typed-item-section v-bind:items="products" type-name="" @addItem="showProductssDialog"
+                          @deleteItem="showSureProduct"></typed-item-section>
     </div>
   </div>
 </template>
@@ -62,6 +83,7 @@ import AddIngredientForm from "@/components/listsViewer/AddIngredientForm";
 import RectButton from "@/components/UI/RectButton";
 import DialogWindow from "@/components/UI/DialogWindow";
 import AddCocktailForm from "@/components/listsViewer/AddCocktailForm";
+import AddProductForm from "@/components/listsViewer/AddProductForm";
 
 async function sendReq(url, reqMethod, params) {
   url = "http://127.0.0.1:8080/api/" + url;
@@ -82,11 +104,12 @@ async function sendReq(url, reqMethod, params) {
 
 export default {
   name: "listsViewer",
-  components: {AddCocktailForm, DialogWindow, RectButton, AddIngredientForm, TypedItemSection, Toggle},
+  components: {AddProductForm, AddCocktailForm, DialogWindow, RectButton, AddIngredientForm, TypedItemSection, Toggle},
   data() {
     return {
       ingredients: this.$store.state.items.ingredients,
       cocktails: this.$store.state.items.cocktails,
+      products: this.$store.state.items.products,
       api_url: "http://127.0.0.1:8080/api/",
       page: 0,
       ingrsDialogVisible: false,
@@ -101,7 +124,14 @@ export default {
       cocksSureName: String,
       cocksSureId: Number,
       cocksAddIsError: false,
-      cocksAddErrorText: ""
+      cocksAddErrorText: "",
+
+      productsSureVisible: false,
+      productsDialogVisible: false,
+      productsSureName: String,
+      productsSureId: Number,
+      productsAddIsError: false,
+      productsAddErrorText: ""
     }
   },
   methods: {
@@ -125,13 +155,59 @@ export default {
         alert(e.message)
       }
     },
+    async fetchProducts() {
+      try {
+        const response = await axios.get(this.api_url + 'products/all')
+        console.log(response)
+        this.$store.commit("items/updateProducts", response.data)
+        this.products = this.$store.state.items.products
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    tabsHandler: function (r) {
+      this.page = r.tab.toLowerCase()
+    },
+    sure: function (type, id) {
+      if (type === 'ingrs') {
+        this.deleteIngredient(id)
+        this.ingrsSureVisible = false
+        this.ingrSureId = -1
+        this.ingrSureName = ""
+      }
+      else if(type === 'products'){
+        this.deleteProduct(id)
+        this.productsSureVisible = false
+        this.productsSureId = -1
+        this.pdouctsrSureName = ""
+      }
+      else {
+        console.log(type + ' ' + id)
+        this.deleteCocktail(id)
+        this.cocksSureVisible = false
+        this.cocksSureId = -1
+        this.cockSureName = ""
+      }
+    },
+    notsure: function (type) {
+      if (type === 'ingrs') {
+        this.ingrsSureVisible = false
+        this.ingrSureId = -1
+        this.ingrSureName = ""
+      } else if (type === 'products') {
+        this.productsSureVisible = false
+        this.productsSureId = -1
+        this.productsSureName = ""
+      } else {
+        this.cocksSureVisible = false
+        this.cocksSureId = -1
+        this.cockSureName = ""
+      }
+    },
     showIngredientsDialog(id) {
       this.ingrAddIsError = false
       this.ingrAddErrorText = ""
       this.ingrsDialogVisible = true
-    },
-    tabsHandler: function (r) {
-      this.page = r.tab.toLowerCase()
     },
     async sendIngredient(newIngredient) {
       let status = false
@@ -167,31 +243,6 @@ export default {
       this.ingrSureId = id
       this.ingrSureName = name
       this.ingrsSureVisible = true
-    },
-    sure: function (type, id) {
-      if (type === 'ingrs') {
-        this.deleteIngredient(id)
-        this.ingrsSureVisible = false
-        this.ingrSureId = -1
-        this.ingrSureName = ""
-      } else {
-        console.log(type + ' ' + id)
-        this.deleteCocktail(id)
-        this.cocksSureVisible = false
-        this.cocksSureId = -1
-        this.cockSureName = ""
-      }
-    },
-    notsure: function (type) {
-      if (type === 'ingrs') {
-        this.ingrsSureVisible = false
-        this.ingrSureId = -1
-        this.ingrSureName = ""
-      } else {
-        this.cocksSureVisible = false
-        this.cocksSureId = -1
-        this.cockSureName = ""
-      }
     },
     async deleteIngredient(id) {
       const response = await axios.delete(this.api_url + 'ingredients?id=' + id)
@@ -268,11 +319,58 @@ export default {
       console.log(response)
       await this.fetchCocktails()
     },
+    showProductsDialog() {
+      this.productsAddIsError = false
+      this.productsAddErrorText = ""
+      this.productsDialogVisible = true
+    },
+    async sendProduct(newProduct) {
+      let status = false
+      let errorText = ""
+      await axios.post(this.api_url + 'products/add', newProduct)
+          .then(function (response) {
+            status = true;
+            console.log(response.status.valueOf())
+          })
+          .catch(function (error) {
+            if (error.response) {
+              // Request made and server responded
+              console.log(error.response.data);
+              errorText = error.response.data
+            } else if (error.request) {
+              // The request was made but no response was received
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              console.log('Error', error.message);
+            }
+          })
+      if (status === true) {
+        await this.fetchProducts()
+        this.productssDialogVisible = false
+      } else {
+        console.log("is Error")
+        this.productsAddIsError = true
+        this.productsAddErrorText = errorText
+      }
+    },
+    showSureProduct(id, name) {
+      this.productsSureId = id
+      this.productsSureName = name
+      this.productsSureVisible = true
+      console.log('trying delete ' + id)
+    },
+    async deleteProduct(id) {
+      const response = await axios.delete(this.api_url + 'products?id=' + id)
+      console.log(response)
+      await this.fetchProducts()
+    }
   },
   mounted() {
     console.log("Fetching")
     this.fetchIngredients()
     this.fetchCocktails()
+    this.fetchProducts()
   }
 }
 </script>
