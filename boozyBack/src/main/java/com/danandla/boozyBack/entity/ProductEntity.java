@@ -1,13 +1,12 @@
 package com.danandla.boozyBack.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "products")
 public class ProductEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
@@ -42,11 +41,11 @@ public class ProductEntity {
         this.description = description;
     }
 
-    public Long getIngredient_id() {
+    public Long getIngredientId() {
         return ingredient_id;
     }
 
-    public void setIngredient_id(Long ingredient_id) {
+    public void setIngredientId(Long ingredient_id) {
         this.ingredient_id = ingredient_id;
     }
 
