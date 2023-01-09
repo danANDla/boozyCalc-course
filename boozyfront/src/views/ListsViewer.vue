@@ -260,6 +260,7 @@ export default {
             })
         if (status === true) {
           await this.fetchIngredients()
+          await this.fetchProducts()
           this.ingrsDialogVisible = false
         } else {
           console.log("is Error")
@@ -277,6 +278,7 @@ export default {
       const response = await axios.delete(this.api_url + 'ingredients?id=' + id)
       console.log(response)
       await this.fetchIngredients()
+      await this.fetchProducts()
     },
     showCocktailsDialog() {
       this.cocksAddIsError = false
