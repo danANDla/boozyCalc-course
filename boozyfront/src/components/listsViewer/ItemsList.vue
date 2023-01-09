@@ -1,6 +1,6 @@
 <template>
   <div class="list-container">
-    <div :class="[this.isRed[index]===0 ? itemContainer : redItemContainer]" v-for="(item,index) in items"
+    <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
          :ref="setItemRef">
 
       <div class="item-body">
@@ -15,7 +15,7 @@
       </div>
 
       <div class="item-navbar">
-        <div class="nav-option">
+        <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
           <div class="nav-icon" @click="editItem(item.id)">
             <font-awesome-icon icon="fa-solid fa-pen" />
           </div>
@@ -54,16 +54,17 @@ export default {
   data() {
     return {
       itemRefs: [],
-      isRed: [],
+      isColor: [],
       itemContainer: 'item-container',
-      redItemContainer: 'red-item-container'
+      redItemContainer: 'red-item-container',
+      whiteItemContainer: 'tan-item-container'
     }
   },
   methods: {
     setItemRef(el) {
       if (el) {
         this.itemRefs.push(el)
-        this.isRed.push(0)
+        this.isColor.push(0)
       }
     },
     addItem() {
@@ -76,10 +77,16 @@ export default {
       this.$emit('editItem', id)
     },
     makeRed: function (index) {
-      this.isRed[index] = 1
+      this.isColor[index] = 1
     },
     makeNotRed: function (index) {
-      this.isRed[index] = 0
+      this.isColor[index] = 0
+    },
+    makeWhite: function (index) {
+      this.isColor[index] = 2
+    },
+    makeNotWhite: function (index) {
+      this.isColor[index] = 0
     }
   },
   beforeUpdate() {
@@ -114,6 +121,15 @@ export default {
   background-color: darkred;
   font-size: 20px;
   border: darkred 1px solid;
+  height: fit-content;
+  display: flex;
+  transition: all 0.5s;
+}
+
+.tan-item-container {
+  background-color: tan;
+  font-size: 20px;
+  border: tan 1px solid;
   height: fit-content;
   display: flex;
   transition: all 0.5s;
