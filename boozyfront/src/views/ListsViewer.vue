@@ -70,7 +70,9 @@
     </div>
     <div v-else>
       <typed-item-section v-bind:items="products" type-name="" @addItem="showProductsDialog"
-                          @deleteItem="showSureProduct"></typed-item-section>
+                          @deleteItem="showSureProduct"
+                          v-bind:ingredients="ingredients"
+                          v-bind:page="'products'"></typed-item-section>
     </div>
   </div>
 </template>
@@ -112,7 +114,7 @@ export default {
       cocktails: this.$store.state.items.cocktails,
       products: this.$store.state.items.products,
       api_url: "http://127.0.0.1:8080/api/",
-      page: 0,
+      page: 'cocktails',
       ingrsDialogVisible: false,
       ingrsSureVisible: false,
       ingrSureName: String,

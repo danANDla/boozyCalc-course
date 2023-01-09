@@ -1,18 +1,22 @@
 <template>
   <div class="section-container">
-    <div class="section-header" v-if="typeName!==''"> {{ this.typeName }}</div>
+    <div class="section-header" v-if="typeName!==''"> {{ typeName }}</div>
     <div class="section-body">
-      <items-grid :items="items" @addItem="addItem" @deleteItem="deleteItem"></items-grid>
+<!--      <items-grid :items="items" @addItem="addItem" @deleteItem="deleteItem"></items-grid>-->
+      <items-list @addItem="addItem" @deleteItem="deleteItem"
+                  :items="items"
+                  :ingredients="ingredients"
+                  :page="page"></items-list>
     </div>
   </div>
 </template>
 
 <script>
-import ItemsGrid from "@/components/listsViewer/ItemsGrid";
+import ItemsList from "@/components/listsViewer/ItemsList";
 
 export default {
   name: "TypedItemSection",
-  components: {ItemsGrid},
+  components: {ItemsList},
 
   props: {
     typeName: {
@@ -22,6 +26,14 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    page:{
+      type: String,
+      required: false
+    },
+    ingredients: {
+      type: Array,
+      required: false
     },
   },
   methods: {
