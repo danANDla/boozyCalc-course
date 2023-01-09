@@ -1,12 +1,12 @@
 package com.danandla.boozyBack.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "ingredients")
 public class IngredientEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
