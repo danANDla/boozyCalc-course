@@ -99,10 +99,10 @@ export default {
   },
   methods: {
     submitData() {
-      this.$emit('submitData', this.product)
+      this.$emit('submitData', {product: this.product, url: "add"})
     },
     editData() {
-      this.$emit('editData', this.product)
+      this.$emit('submitData', {product: this.product, url: "edit"})
     },
     updatePrice() {
       if (this.price <= 0) this.price = 0;

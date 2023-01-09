@@ -37,7 +37,6 @@
   <dialog-window v-model:show="productsDialogVisible">
     <div class="form-container">
       <add-product-form @submitData="sendProduct"
-                        @editData="editProduct"
                         @input="this.productsAddIsError = false; this.productsAddErrorText=''"
                         :is-error="productsAddIsError"
                         :error-text="productsAddErrorText"
@@ -349,7 +348,8 @@ export default {
       this.productsAddErrorText = ""
       this.productsDialogVisible = true
     },
-    async sendProduct(newProduct) {
+    async sendProduct(args) {
+      let newProduct = args.product;
       let status = false
       let errorText = ""
       let badNewItem = false
@@ -364,47 +364,7 @@ export default {
         this.productsAddErrorText = "empty name field"
       }
       if(!badNewItem){
-        await axios.post(this.api_url + 'products/add', newProduct)
-            .then(function (response) {
-              status = true;
-              console.log(response.status.valueOf())
-            })
-            .catch(function (error) {
-              if (error.response) {
-                console.log(error.response.data);
-                errorText = error.response.data
-              } else if (error.request) {
-                console.log(error.request);
-              } else {
-                console.log('Error', error.message);
-              }
-            })
-        if (status === true) {
-          await this.fetchProducts()
-          this.productsDialogVisible = false
-        } else {
-          console.log("is Error")
-          this.productsAddIsError = true
-          this.productsAddErrorText = errorText
-        }
-      }
-    },
-    async editProduct(newProduct) {
-      let status = false
-      let errorText = ""
-      let badNewItem = false
-      if (newProduct.price <= 0 || newProduct.ingredientId === -1) {
-        this.productsAddIsError = true
-        badNewItem = true
-        this.productsAddErrorText = "bad ingredient pick"
-      }
-      if (newProduct.name === "") {
-        this.productsAddIsError = true
-        badNewItem = true
-        this.productsAddErrorText = "empty name field"
-      }
-      if(!badNewItem){
-        await axios.post(this.api_url + 'products/edit', newProduct)
+        await axios.post(this.api_url + 'products/' + args.url, newProduct)
             .then(function (response) {
               status = true;
               console.log(response.status.valueOf())
