@@ -13,6 +13,7 @@ import com.danandla.boozyBack.repository.RecipeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,9 +27,24 @@ public class CocktailService {
     @Autowired
     private RecipeRepo recipeRepo;
 
-    public List<CocktailEntity> getAllCocktails() {
+    public List<CocktailModel> getAllCocktails() {
         List<CocktailEntity> list = (List<CocktailEntity>) cocktailRepo.findAll();
-        return list;
+        ArrayList<CocktailModel> retList = new ArrayList<>();
+        for(CocktailEntity i: list){
+           List<RecipeEntity> recipe = recipeRepo.findByCocktailId(i.getId());
+           ArrayList<WeightedIngredientModel> ingredients = new ArrayList<>();
+           for(RecipeEntity j: recipe) ingredients.add(new WeightedIngredientModel(j.getIngredient_id(), j.getQuantity()));
+           CocktailModel cocktail = new CocktailModel(
+                   i.getId(),
+                   i.getName(),
+                   i.getDescription(),
+                   i.getRecipe(),
+                   i.getType_id(),
+                   ingredients
+           );
+           retList.add(cocktail);
+        }
+        return retList;
     }
 
     public CocktailEntity addCocktail(CocktailModel newCocktail) throws ItemNameUsedException, ItemIdNotFoundException {

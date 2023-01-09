@@ -23,6 +23,11 @@ public class WeightedIngredientModel {
         this.amount = amount;
     }
 
+    public WeightedIngredientModel(Long ingredientId, float amount) {
+        this.ingredientId = ingredientId;
+        this.amount = amount;
+    }
+
     @Override
     public String toString() {
         return "WeightedIngredient{" +

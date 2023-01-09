@@ -11,6 +11,15 @@ public class CocktailModel {
     private Long type_id;
     private List<WeightedIngredientModel> ingredients;
 
+    public CocktailModel(Long id, String name, String description, String recipe, Long type_id, List<WeightedIngredientModel> ingredients) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.recipe = recipe;
+        this.type_id = type_id;
+        this.ingredients = ingredients;
+    }
+
     public Long getId() {
         return id;
     }
