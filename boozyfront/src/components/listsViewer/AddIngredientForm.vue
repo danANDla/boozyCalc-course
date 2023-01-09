@@ -18,8 +18,11 @@
             placeholder="description"
         />
       </div>
-      <div class="btn-container">
+      <div class="btn-container" v-if="!isEdit">
         <rect-button btn-type="purple" @click="submitData"> add </rect-button>
+      </div>
+      <div class="btn-container" v-else>
+        <rect-button btn-type="purple" @click="editData"> edit </rect-button>
       </div>
     </div>
   </form>
@@ -39,23 +42,37 @@ export default {
     errorText:{
       type: String,
       default: ""
+    },
+    prevIngredient:{
+      required: false
     }
   },
   data(){
     return{
       ingredient:{
         name: '',
-        description: ''
-      }
+        description: '',
+        id: undefined
+      },
+      isEdit: false
     }
   },
   methods:{
     submitData(){
-      this.$emit('submitData', this.ingredient)
+      this.$emit('submitData', {ingredient: this.ingredient, url: "add"})
     },
-
+    editData() {
+      this.$emit('submitData', {ingredient: this.ingredient, url: "edit"})
+    },
+  },
+  mounted() {
+    if (this.prevIngredient !== undefined) {
+      this.ingredient.name = this.prevIngredient.name;
+      this.ingredient.description = this.prevIngredient.description;
+      this.ingredient.id = this.prevIngredient.id;
+      this.isEdit = true;
+    }
   }
-
 }
 </script>
 

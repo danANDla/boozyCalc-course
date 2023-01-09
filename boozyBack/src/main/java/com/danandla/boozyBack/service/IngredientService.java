@@ -2,6 +2,8 @@ package com.danandla.boozyBack.service;
 
 
 import com.danandla.boozyBack.entity.IngredientEntity;
+import com.danandla.boozyBack.entity.ProductEntity;
+import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.repository.IngredientRepo;
@@ -34,5 +36,13 @@ public class IngredientService {
         if (ingrRepo.findByName(newIngredient.getName()) != null)
             throw new ItemNameUsedException("ingredient with this name already exists");
         return ingrRepo.save(newIngredient);
+    }
+
+    public IngredientEntity editIngredient(IngredientEntity newIngredient) throws ItemIdNotFoundException, IllegalArgumentException {
+        if(ingrRepo.findById(newIngredient.getId()).isEmpty()) throw new ItemIdNotFoundException("ingredient with this id was not found");
+        IngredientEntity ingredient = ingrRepo.findById(newIngredient.getId()).get();
+        ingredient.setDescription(newIngredient.getDescription());
+        ingredient.setName(newIngredient.getName());
+        return ingrRepo.save(ingredient);
     }
 }

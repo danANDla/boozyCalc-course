@@ -4,7 +4,8 @@
       <add-ingredient-form @submitData="sendIngredient"
                            @input="this.ingredientsAddIsError = false; this.ingredientsAddErrorText=''"
                            :is-error="ingredientsAddIsError"
-                           :error-text="ingredientsAddErrorText">
+                           :error-text="ingredientsAddErrorText"
+                           :prev-ingredient="prevIngredient">
       </add-ingredient-form>
     </div>
   </dialog-window>
@@ -62,8 +63,10 @@
       />
     </div>
     <div v-if="page==='ingredients'">
-      <typed-item-section v-bind:items="ingredients" type-name="" @addItem="showIngredientsDialog"
-                          @deleteItem="showSureIngredient"></typed-item-section>
+      <typed-item-section v-bind:items="ingredients" type-name=""
+                          @addItem="showIngredientsDialog"
+                          @deleteItem="showSureIngredient"
+                          @editItem="showIngredientsEditDialog"></typed-item-section>
     </div>
     <div v-else-if="page==='cocktails'">
       <typed-item-section v-bind:items="cocktails" type-name="" @addItem="showCocktailsDialog"
@@ -120,6 +123,7 @@ export default {
       page: 'cocktails',
 
       prevProduct: undefined,
+      prevIngredient: undefined,
 
       ingrsDialogVisible: false,
       ingrsSureVisible: false,
@@ -214,11 +218,19 @@ export default {
       }
     },
     showIngredientsDialog(id) {
+      this.prevIngredient = undefined
       this.ingredientsAddIsError = false
       this.ingredientsAddErrorText = ""
       this.ingrsDialogVisible = true
     },
-    async sendIngredient(newIngredient) {
+    showIngredientsEditDialog(id) {
+      this.prevIngredient = this.ingredients.find(x => x.id === id)
+      this.ingredientsAddIsError = false
+      this.ingredientsAddErrorText = ""
+      this.ingrsDialogVisible = true
+    },
+    async sendIngredient(args) {
+      let newIngredient = args.ingredient
       let status = false
       let errorText = ""
       let badNewItem = false
@@ -228,7 +240,7 @@ export default {
         this.ingredientsAddErrorText = "empty name field"
       }
       if(!badNewItem){
-        await axios.post(this.api_url + 'ingredients/add', newIngredient)
+        await axios.post(this.api_url + 'ingredients/' + args.url, newIngredient)
             .then(function (response) {
               status = true;
               console.log(response.status.valueOf())
@@ -343,7 +355,6 @@ export default {
     },
     showProductsEditDialog(id) {
       this.prevProduct = this.products.find(x => x.id === id)
-      console.log(id, this.prevProduct)
       this.productsAddIsError = false
       this.productsAddErrorText = ""
       this.productsDialogVisible = true

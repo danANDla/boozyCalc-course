@@ -2,6 +2,7 @@ package com.danandla.boozyBack.controller;
 
 
 import com.danandla.boozyBack.entity.IngredientEntity;
+import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.service.IngredientService;
@@ -45,6 +46,19 @@ public class IngredientController {
             ingredientService.addIngredient(newIngredient);
             return ResponseEntity.ok("ingredient successfully added");
         } catch (ItemNameUsedException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PostMapping("/edit")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity editIngredient(@RequestBody IngredientEntity newIngredient) {
+        try {
+            ingredientService.editIngredient(newIngredient);
+            return ResponseEntity.ok("ingredient successfully added");
+        } catch (ItemIdNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
