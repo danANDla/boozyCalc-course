@@ -26,7 +26,10 @@ public class ProductService {
         ArrayList<ProductEntity> list = (ArrayList<ProductEntity>) productRepo.findAll();
         ArrayList<ProductModel> retList = new ArrayList<>();
         for(ProductEntity i: list){
-            String ingrName = (ingredientRepo.findById(i.getIngredientId()).get()).getName();
+            String ingrName = "";
+            if(i.getIngredientId() != null && ingredientRepo.existsById(i.getIngredientId())){
+                ingrName = (ingredientRepo.findById(i.getIngredientId()).get()).getName();
+            }
             retList.add(new ProductModel(i.getId(), i.getName(), ingrName, i.getIngredientId(), i.getPrice()));
         }
         return retList;
@@ -48,5 +51,15 @@ public class ProductService {
             throw new ItemIdNotFoundException("ingredient with this id was not found");
 
         return productRepo.save(newProduct);
+    }
+
+    public ProductEntity editProduct(ProductEntity newProduct) throws ItemIdNotFoundException, IllegalArgumentException {
+        if(productRepo.findById(newProduct.getId()).isEmpty()) throw new ItemIdNotFoundException("product with this id was not found");
+        ProductEntity product = productRepo.findById(newProduct.getId()).get();
+        product.setDescription(newProduct.getDescription());
+        product.setPrice(newProduct.getPrice());
+        product.setName(newProduct.getName());
+        product.setIngredientId(newProduct.getIngredientId());
+        return productRepo.save(product);
     }
 }

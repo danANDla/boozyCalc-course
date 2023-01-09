@@ -37,10 +37,12 @@
   <dialog-window v-model:show="productsDialogVisible">
     <div class="form-container">
       <add-product-form @submitData="sendProduct"
-                         @input="this.productsAddIsError = false; this.productsAddErrorText=''"
-                         :is-error="productsAddIsError"
-                         :error-text="productsAddErrorText"
-                         :ingredients="ingredients">
+                        @editData="editProduct"
+                        @input="this.productsAddIsError = false; this.productsAddErrorText=''"
+                        :is-error="productsAddIsError"
+                        :error-text="productsAddErrorText"
+                        :ingredients="ingredients"
+                        :prev-product="prevProduct">
       </add-product-form>
     </div>
   </dialog-window>
@@ -69,8 +71,10 @@
                           @deleteItem="showSureCocktail"></typed-item-section>
     </div>
     <div v-else>
-      <typed-item-section v-bind:items="products" type-name="" @addItem="showProductsDialog"
+      <typed-item-section v-bind:items="products" type-name=""
+                          @addItem="showProductsDialog"
                           @deleteItem="showSureProduct"
+                          @editItem="showProductsEditDialog"
                           v-bind:ingredients="ingredients"
                           v-bind:page="'products'"></typed-item-section>
     </div>
@@ -115,6 +119,9 @@ export default {
       products: this.$store.state.items.products,
       api_url: "http://127.0.0.1:8080/api/",
       page: 'cocktails',
+
+      prevProduct: undefined,
+
       ingrsDialogVisible: false,
       ingrsSureVisible: false,
       ingrSureName: String,
@@ -330,6 +337,14 @@ export default {
       await this.fetchCocktails()
     },
     showProductsDialog() {
+      this.prevProduct = undefined
+      this.productsAddIsError = false
+      this.productsAddErrorText = ""
+      this.productsDialogVisible = true
+    },
+    showProductsEditDialog(id) {
+      this.prevProduct = this.products.find(x => x.id === id)
+      console.log(id, this.prevProduct)
       this.productsAddIsError = false
       this.productsAddErrorText = ""
       this.productsDialogVisible = true
@@ -356,14 +371,51 @@ export default {
             })
             .catch(function (error) {
               if (error.response) {
-                // Request made and server responded
                 console.log(error.response.data);
                 errorText = error.response.data
               } else if (error.request) {
-                // The request was made but no response was received
                 console.log(error.request);
               } else {
-                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+            })
+        if (status === true) {
+          await this.fetchProducts()
+          this.productsDialogVisible = false
+        } else {
+          console.log("is Error")
+          this.productsAddIsError = true
+          this.productsAddErrorText = errorText
+        }
+      }
+    },
+    async editProduct(newProduct) {
+      let status = false
+      let errorText = ""
+      let badNewItem = false
+      if (newProduct.price <= 0 || newProduct.ingredientId === -1) {
+        this.productsAddIsError = true
+        badNewItem = true
+        this.productsAddErrorText = "bad ingredient pick"
+      }
+      if (newProduct.name === "") {
+        this.productsAddIsError = true
+        badNewItem = true
+        this.productsAddErrorText = "empty name field"
+      }
+      if(!badNewItem){
+        await axios.post(this.api_url + 'products/edit', newProduct)
+            .then(function (response) {
+              status = true;
+              console.log(response.status.valueOf())
+            })
+            .catch(function (error) {
+              if (error.response) {
+                console.log(error.response.data);
+                errorText = error.response.data
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
                 console.log('Error', error.message);
               }
             })

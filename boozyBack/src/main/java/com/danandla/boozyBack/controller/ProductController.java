@@ -52,4 +52,17 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e);
         }
     }
+
+    @PostMapping("/edit")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity editProduct(@RequestBody ProductEntity newProduct) {
+        try {
+            productService.editProduct(newProduct);
+            return ResponseEntity.ok("cocktail successfully added");
+        } catch (ItemIdNotFoundException | IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

@@ -5,17 +5,19 @@
 
       <div class="item-body">
         <div v-if="page==='products' && this.ingredients !== undefined">
-            <div class="item-name">{{ item.name }} {{item.ingredientName}}</div>
+          <div class="item-name">{{ item.name }}</div>
+          <div class="item-info"> {{ item.ingredientName }}</div>
+          <div class="item-info"> {{ item.price }}</div>
         </div>
         <div v-else>
-            <div class="item-name">{{ item.name }}</div>
+          <div class="item-name">{{ item.name }}</div>
         </div>
       </div>
 
       <div class="item-navbar">
         <div class="nav-option">
-          <div class="nav-icon">
-            <font-awesome-icon icon="fa-solid fa-bars"/>
+          <div class="nav-icon" @click="editItem(item.id)">
+            <font-awesome-icon icon="fa-solid fa-pen" />
           </div>
         </div>
         <div class="nav-option" @mouseover="this.makeRed(index)" @mouseleave="this.makeNotRed(index)">
@@ -40,7 +42,7 @@ export default {
       type: Array,
       required: true
     },
-    page:{
+    page: {
       type: String,
       required: false
     },
@@ -69,6 +71,9 @@ export default {
     },
     deleteItem(id, name) {
       this.$emit('deleteItem', id, name)
+    },
+    editItem(id) {
+      this.$emit('editItem', id)
     },
     makeRed: function (index) {
       this.isRed[index] = 1
@@ -131,7 +136,6 @@ export default {
   padding: 10px 10px;
   width: fit-content;
   display: flex;
-  align-items: center;
 }
 
 .nav-option {
@@ -144,27 +148,18 @@ export default {
   color: white;
 }
 
-.item-body {
+.item-body{
+  width: 100%;
+}
+
+.item-body  div{
   width: 100%;
   display: flex;
   flex-direction: row;
   overflow-x: hidden;
   overflow-y: scroll;
-  justify-content: center;
   align-items: center;
-}
-
-.item-body div {
-  width: 100%;
   height: 100%;
-}
-
-.item-info {
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-
-.item-container {
 }
 
 .item-name {

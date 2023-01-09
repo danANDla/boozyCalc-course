@@ -48,8 +48,11 @@
             disabled
         />
       </div>
-      <div class="btn-container">
-        <rect-button btn-type="purple" @click="submitData"> add</rect-button>
+      <div class="btn-container" v-if="!isEdit">
+        <rect-button btn-type="purple" @click="submitData"> add </rect-button>
+      </div>
+      <div class="btn-container" v-else>
+        <rect-button btn-type="purple" @click="editData"> edit </rect-button>
       </div>
     </div>
   </form>
@@ -76,6 +79,9 @@ export default {
       type: Array,
       default: ""
     },
+    prevProduct:{
+      required: false
+    }
   },
   data() {
     return {
@@ -83,15 +89,20 @@ export default {
         name: '',
         description: '',
         price: undefined,
-        ingredientId: -1
+        ingredientId: undefined,
+        id: undefined
       },
       amount: undefined,
-      price: undefined
+      price: undefined,
+      isEdit: false
     }
   },
   methods: {
     submitData() {
       this.$emit('submitData', this.product)
+    },
+    editData() {
+      this.$emit('editData', this.product)
     },
     updatePrice() {
       if (this.price <= 0) this.price = 0;
@@ -99,6 +110,18 @@ export default {
       if (this.amount !== 0) this.product.price = Math.round(1000 * this.price / this.amount) / 1000;
     }
   },
+  mounted(){
+    if(this.prevProduct !== undefined){
+      this.product.name = this.prevProduct.name;
+      this.product.ingredientId = this.prevProduct.ingredientId;
+      this.product.description = this.prevProduct.description;
+      this.product.price = this.prevProduct.price;
+      this.product.id = this.prevProduct.id;
+      this.amount = 1;
+      this.price = this.product.price;
+      this.isEdit = true;
+    }
+  }
 }
 </script>
 
