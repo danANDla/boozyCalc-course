@@ -27,6 +27,13 @@
       </add-cocktail-form>
     </div>
   </dialog-window>
+
+  <dialog-window v-model:show="cocktailsInfoVisible">
+    <div class="info-container">
+      <cocktail-info :cocktail="currentCocktail" :ingredients="ingredients"></cocktail-info>
+    </div>
+  </dialog-window>
+
   <dialog-window v-model:show="cocksSureVisible">
     <div class="form-container">
       <are-you-sure @sure="sure('cocks', cocksSureId)" @notsure="notsure('cocks')"> Are you sure you want to delete
@@ -69,8 +76,10 @@
                           @editItem="showIngredientsEditDialog"></typed-item-section>
     </div>
     <div v-else-if="page==='cocktails'">
-      <typed-item-section v-bind:items="cocktails" type-name="" @addItem="showCocktailsDialog"
-                          @deleteItem="showSureCocktail"></typed-item-section>
+      <typed-item-section v-bind:items="cocktails" type-name=""
+                          @addItem="showCocktailsDialog"
+                          @deleteItem="showSureCocktail"
+                          @showItem="showCocktailsInfo"></typed-item-section>
     </div>
     <div v-else>
       <typed-item-section v-bind:items="products" type-name=""
@@ -93,6 +102,7 @@ import RectButton from "@/components/UI/RectButton";
 import DialogWindow from "@/components/UI/DialogWindow";
 import AddCocktailForm from "@/components/listsViewer/AddCocktailForm";
 import AddProductForm from "@/components/listsViewer/AddProductForm";
+import CocktailInfo from "@/components/listsViewer/CocktailInfo";
 
 async function sendReq(url, reqMethod, params) {
   url = "http://127.0.0.1:8080/api/" + url;
@@ -113,7 +123,7 @@ async function sendReq(url, reqMethod, params) {
 
 export default {
   name: "listsViewer",
-  components: {AddProductForm, AddCocktailForm, DialogWindow, RectButton, AddIngredientForm, TypedItemSection, Toggle},
+  components: {CocktailInfo, AddProductForm, AddCocktailForm, DialogWindow, RectButton, AddIngredientForm, TypedItemSection, Toggle},
   data() {
     return {
       ingredients: this.$store.state.items.ingredients,
@@ -124,6 +134,7 @@ export default {
 
       prevProduct: undefined,
       prevIngredient: undefined,
+      currentCocktail: undefined,
 
       ingrsDialogVisible: false,
       ingrsSureVisible: false,
@@ -134,6 +145,7 @@ export default {
 
       cocksSureVisible: false,
       cocksDialogVisible: false,
+      cocktailsInfoVisible: false,
       cocksSureName: String,
       cocksSureId: Number,
       cocksAddIsError: false,
@@ -285,6 +297,17 @@ export default {
       this.cocksAddErrorText = ""
       this.cocksDialogVisible = true
     },
+    showSureCocktail(id, name) {
+      this.cocksSureId = id
+      this.cocksSureName = name
+      this.cocksSureVisible = true
+      console.log('trying delete ' + id)
+    },
+    showCocktailsInfo(id){
+      this.cocktailsInfoVisible = true
+      console.log('showCocktailsInfo', id)
+      this.currentCocktail = this.cocktails.find(x => x.id === id)
+    },
     async sendCocktail(newCocktail) {
       let badNewItem = false
       if (newCocktail.ingredients.length === 0) {
@@ -337,12 +360,6 @@ export default {
           this.cocksAddErrorText = errorText
         }
       }
-    },
-    showSureCocktail(id, name) {
-      this.cocksSureId = id
-      this.cocksSureName = name
-      this.cocksSureVisible = true
-      console.log('trying delete ' + id)
     },
     async deleteCocktail(id) {
       const response = await axios.delete(this.api_url + 'cocktails?id=' + id)

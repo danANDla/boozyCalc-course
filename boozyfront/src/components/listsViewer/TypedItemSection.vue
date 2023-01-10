@@ -3,7 +3,7 @@
     <div class="section-header" v-if="typeName!==''"> {{ typeName }}</div>
     <div class="section-body">
 <!--      <items-grid :items="items" @addItem="addItem" @deleteItem="deleteItem"></items-grid>-->
-      <items-list @addItem="addItem" @deleteItem="deleteItem" @editItem="editItem"
+      <items-list @addItem="addItem" @deleteItem="deleteItem" @editItem="editItem" @showItem="showItem"
                   :items="items"
                   :ingredients="ingredients"
                   :page="page"></items-list>
@@ -45,6 +45,9 @@ export default {
     },
     editItem(id) {
       this.$emit('editItem', id)
+    },
+    showItem(id) {
+      this.$emit('showItem', id)
     }
   }
 }

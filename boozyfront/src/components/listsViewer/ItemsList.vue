@@ -1,7 +1,8 @@
 <template>
   <div class="list-container">
     <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
-         :ref="setItemRef">
+         :ref="setItemRef"
+         @click="showItem(item.id)">
 
       <div class="item-body">
         <div v-if="page==='products' && this.ingredients !== undefined">
@@ -75,6 +76,9 @@ export default {
     },
     editItem(id) {
       this.$emit('editItem', id)
+    },
+    showItem(id){
+      this.$emit('showItem', id)
     },
     makeRed: function (index) {
       this.isColor[index] = 1
