@@ -59,11 +59,11 @@ export default {
   flex-direction: column;
   align-items: center;
   min-width: 40vw;
-  min-height: 50vh;
+  height: 50vh;
+  max-width: 60vw;
 }
 
 .cocktail-name{
-
   height: fit-content;
   font-size: xx-large;
   padding: 5px;
@@ -95,7 +95,8 @@ export default {
 
 .info-body{
   background-color: #576163;
-  height: fit-content;
+  overflow-y: scroll;
+  text-align: justify;
   padding: 5px;
   margin: 5px;
   border-radius: 10px;
