@@ -1,10 +1,9 @@
 <template>
   <div class="list-container">
     <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
-         :ref="setItemRef"
-         @click="showItem(item.id)">
+         :ref="setItemRef">
 
-      <div class="item-body">
+      <div class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
           <div class="item-name">{{ item.name }}</div>
           <div class="item-info"> {{ item.ingredientName }}</div>

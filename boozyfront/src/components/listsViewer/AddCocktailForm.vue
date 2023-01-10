@@ -26,8 +26,11 @@
           <item-picker :item-list="ingredients" v-model:pickedItems="this.cocktail.ingredients"> </item-picker>
         </div>
       </div>
-      <div class="btn-container">
+      <div class="btn-container" v-if="!isEdit">
         <rect-button btn-type="purple" @click="submitData"> add </rect-button>
+      </div>
+      <div class="btn-container" v-else>
+        <rect-button btn-type="purple" @click="editData"> edit </rect-button>
       </div>
     </div>
   </form>
@@ -53,6 +56,9 @@ export default {
     ingredients:{
       type: Array,
       default: ""
+    },
+    prevCocktail:{
+      required: false
     }
   },
   data(){
@@ -60,15 +66,30 @@ export default {
       cocktail:{
         name: '',
         description: '',
-        ingredients: []
-      }
+        ingredients: [],
+        id: undefined,
+        type_id: 1
+      },
+      isEdit: false
     }
   },
   methods:{
     submitData(){
-      this.$emit('submitData', this.cocktail)
+      this.$emit('submitData', { cocktail: this.cocktail, url: 'add'})
     },
 
+    editData(){
+      this.$emit('submitData', { cocktail: this.cocktail, url: 'edit'})
+    },
+  },
+  mounted(){
+    if(this.prevCocktail !== undefined){
+      this.cocktail.name = this.prevCocktail.name;
+      this.cocktail.description = this.prevCocktail.description;
+      this.cocktail.id = this.prevCocktail.id;
+      this.cocktail.ingredients = this.prevCocktail.ingredients;
+      this.isEdit = true;
+    }
   }
 }
 </script>

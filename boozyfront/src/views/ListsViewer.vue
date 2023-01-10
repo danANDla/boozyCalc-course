@@ -23,7 +23,8 @@
                          @input="this.cocksAddIsError = false; this.cocksAddErrorText=''"
                          :is-error="cocksAddIsError"
                          :error-text="cocksAddErrorText"
-                         :ingredients="ingredients">
+                         :ingredients="ingredients"
+                         :prev-cocktail="currentCocktail">
       </add-cocktail-form>
     </div>
   </dialog-window>
@@ -79,6 +80,7 @@
       <typed-item-section v-bind:items="cocktails" type-name=""
                           @addItem="showCocktailsDialog"
                           @deleteItem="showSureCocktail"
+                          @editItem="showCocktailsEditDialog"
                           @showItem="showCocktailsInfo"></typed-item-section>
     </div>
     <div v-else>
@@ -297,6 +299,13 @@ export default {
       this.cocksAddErrorText = ""
       this.cocksDialogVisible = true
     },
+    showCocktailsEditDialog(id) {
+      this.currentCocktail = this.cocktails.find(x => x.id === id)
+      console.log(this.currentCocktail)
+      this.cocksAddIsError = false
+      this.cocksAddErrorText = ""
+      this.cocksDialogVisible = true
+    },
     showSureCocktail(id, name) {
       this.cocksSureId = id
       this.cocksSureName = name
@@ -308,7 +317,8 @@ export default {
       console.log('showCocktailsInfo', id)
       this.currentCocktail = this.cocktails.find(x => x.id === id)
     },
-    async sendCocktail(newCocktail) {
+    async sendCocktail(args) {
+      let newCocktail = args.cocktail
       let badNewItem = false
       if (newCocktail.ingredients.length === 0) {
         this.cocksAddIsError = true
@@ -333,7 +343,7 @@ export default {
         console.log(newCocktail)
         let status = false
         let errorText = ""
-        await axios.post(this.api_url + 'cocktails/add', newCocktail)
+        await axios.post(this.api_url + 'cocktails/' + args.url, newCocktail)
             .then(function (response) {
               status = true;
               console.log(response.status.valueOf())

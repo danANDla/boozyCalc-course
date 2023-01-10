@@ -1,6 +1,7 @@
 package com.danandla.boozyBack.service;
 
 import com.danandla.boozyBack.entity.CocktailEntity;
+import com.danandla.boozyBack.entity.ProductEntity;
 import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
@@ -66,6 +67,26 @@ public class CocktailService {
             recipeRepo.save(recipeEntity);
         }
         return saved;
+    }
+
+    public CocktailEntity editCocktail(CocktailModel newCocktail) throws ItemIdNotFoundException, IllegalArgumentException {
+        if(cocktailRepo.findById(newCocktail.getId()).isEmpty()) throw new ItemIdNotFoundException("cocktail with this id was not found");
+        CocktailEntity cocktail = cocktailRepo.findById(newCocktail.getId()).get();
+        cocktail.setName(newCocktail.getName());
+        cocktail.setDescription(newCocktail.getDescription());
+        cocktail.setType_id(newCocktail.getType_id());
+
+        ArrayList<RecipeEntity> ingredients = (ArrayList<RecipeEntity>) recipeRepo.findByCocktailId(cocktail.getId());
+        recipeRepo.deleteAll(ingredients);
+
+        CocktailEntity saved = cocktailRepo.save(cocktail);
+        System.out.println(newCocktail.getIngredients());
+        for (WeightedIngredientModel i : newCocktail.getIngredients()) {
+            RecipeEntity recipeEntity = new RecipeEntity(i.getIngredientId(), saved.getId(), i.getAmount());
+            recipeRepo.save(recipeEntity);
+            System.out.println(recipeEntity);
+        }
+        return cocktailRepo.save(cocktail);
     }
 
     public Long deleteById(Long cocktailId) throws ItemNameNotFoundException {

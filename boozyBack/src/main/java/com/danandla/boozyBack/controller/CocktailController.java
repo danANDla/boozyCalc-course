@@ -1,6 +1,7 @@
 package com.danandla.boozyBack.controller;
 
 import com.danandla.boozyBack.entity.CocktailEntity;
+import com.danandla.boozyBack.entity.ProductEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
@@ -36,6 +37,19 @@ public class CocktailController {
         } catch (ItemNameUsedException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (ItemIdNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PostMapping("/edit")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity editCocktail(@RequestBody CocktailModel newCocktail) {
+        try {
+            cocktailService.editCocktail(newCocktail);
+            return ResponseEntity.ok("cocktail successfully added");
+        } catch (ItemIdNotFoundException | IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
