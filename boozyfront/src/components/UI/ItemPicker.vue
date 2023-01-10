@@ -63,6 +63,7 @@ export default {
     },
     deleteItem(index) {
       this.pickedItems.splice(index, 1)
+      this.isRed[index] = 0
     },
     makeRed: function (index) {
       this.isRed[index] = 1
