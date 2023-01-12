@@ -11,7 +11,7 @@
     </main>
 
     <nav>
-      <nav-menu></nav-menu>
+      <nav-menu :user-group="1"></nav-menu>
     </nav>
 
     <aside>Sidebar</aside>

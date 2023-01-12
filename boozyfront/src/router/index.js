@@ -1,25 +1,41 @@
-import HomePage from "@/views/HomePage";
+import AdminHomePage from "@/views/adminPart/AdminHomePage";
 import {createRouter, createWebHistory } from "vue-router";
-import ListsViewer from "@/views/ListsViewer";
+import AdminListsViewer from "@/views/adminPart/AdminListsViewer";
+import UserListsViewer from "@/views/userPart/UserListsViewer";
 import WelcomePage from "@/views/WelcomePage";
+import UserMainPage from "@/views/userPart/UserMainPage";
+import Main from "@/views/Main"
 
 const routes = [
-        {
-            path: '/',
-            component: HomePage,
-            children:[
-                {
-                    path: "",
-                    name: "welcome-page",
-                    component: WelcomePage
-                },
-                {
-                    path: "items",
-                    name: "ingredients-and-cocktails",
-                    component: ListsViewer
-                }
-            ]
-        }
+    {
+        path: '/',
+        component: Main,
+        children: [
+            {
+                path: "items",
+                name: "ingredients-and-cocktails",
+                component: UserMainPage,
+                children: [
+                    {
+                        path: "",
+                        name: "ingredients-and-cocktails",
+                        component: UserListsViewer
+                    }
+                ]
+            },
+            {
+                path: 'admin',
+                component: AdminHomePage,
+                children:[
+                    {
+                        path: "lists",
+                        name: "items",
+                        component: AdminListsViewer
+                    },
+                ]
+            }
+        ]
+    }
 ]
 
 const router = createRouter({

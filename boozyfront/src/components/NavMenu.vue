@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="menu">
+    <div class="menu" v-if="this.userGroup === 1">
       <div class="item">
-        <router-link to="/items" v-slot="{ href, navigate}">
+        <router-link to="/admin/lists" v-slot="{ href, navigate}">
           <menu-nav-button :href="href" @click="navigate">Ingredients | Cocktails</menu-nav-button>
         </router-link>
       </div>
@@ -13,6 +13,17 @@
         <menu-nav-button>Parties</menu-nav-button>
       </div>
     </div>
+
+    <div class="menu" v-if="this.userGroup === 0">
+      <div class="item">
+        <menu-nav-button>Parties</menu-nav-button>
+      </div>
+      <div class="item">
+        <router-link to="/items" v-slot="{ href, navigate}">
+          <menu-nav-button :href="href" @click="navigate">Ingredients | Cocktails</menu-nav-button>
+        </router-link>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,8 +31,13 @@
 import MenuNavButton from "@/components/UI/MenuNavButton";
 export default {
   name: "NavMenu",
-  components: {MenuNavButton}
-
+  components: {MenuNavButton},
+  props:{
+    userGroup: {
+      type: Number,
+      required: true
+    }
+  }
 }
 </script>
 
