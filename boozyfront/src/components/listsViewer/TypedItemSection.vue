@@ -6,7 +6,7 @@
       <items-list @addItem="addItem" @deleteItem="deleteItem" @editItem="editItem" @showItem="showItem"
                   :items="items"
                   :ingredients="ingredients"
-                  :page="page"></items-list>
+                  :page="page" :user-group="this.userGroup"></items-list>
     </div>
   </div>
 </template>
@@ -35,6 +35,10 @@ export default {
       type: Array,
       required: false
     },
+    userGroup: {
+      type: Number,
+      required: true
+    }
   },
   methods: {
     addItem() {

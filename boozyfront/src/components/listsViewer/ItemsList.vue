@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <div class="item-navbar">
+      <div class="item-navbar" v-if="userGroup===1">
         <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
           <div class="nav-icon" @click="editItem(item.id)">
             <font-awesome-icon icon="fa-solid fa-pen" />
@@ -27,7 +27,7 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem">
+    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -50,6 +50,10 @@ export default {
       type: Array,
       required: false
     },
+    userGroup: {
+      type: Number,
+      required: true
+    }
   },
   data() {
     return {

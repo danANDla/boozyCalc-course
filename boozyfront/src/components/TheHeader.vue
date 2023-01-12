@@ -6,7 +6,7 @@
 
     <ul class="nav">
       <li>
-        <router-link to="/"> welcome </router-link>
+        <router-link to="/about"> about </router-link>
       </li>
       <li>
         <router-link to="/"> log in </router-link>

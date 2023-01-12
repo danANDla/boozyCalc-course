@@ -33,7 +33,12 @@ const routes = [
                         component: AdminListsViewer
                     },
                 ]
-            }
+            },
+            {
+                path: "about",
+                name: "about",
+                component: WelcomePage
+            },
         ]
     }
 ]

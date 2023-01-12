@@ -71,20 +71,20 @@
       />
     </div>
     <div v-if="page==='ingredients'">
-      <typed-item-section v-bind:items="ingredients" type-name=""
+      <typed-item-section v-bind:items="ingredients" type-name="" :user-group="1"
                           @addItem="showIngredientsDialog"
                           @deleteItem="showSureIngredient"
                           @editItem="showIngredientsEditDialog"></typed-item-section>
     </div>
     <div v-else-if="page==='cocktails'">
-      <typed-item-section v-bind:items="cocktails" type-name=""
+      <typed-item-section v-bind:items="cocktails" type-name="" :user-group="1"
                           @addItem="showCocktailsDialog"
                           @deleteItem="showSureCocktail"
                           @editItem="showCocktailsEditDialog"
                           @showItem="showCocktailsInfo"></typed-item-section>
     </div>
     <div v-else>
-      <typed-item-section v-bind:items="products" type-name=""
+      <typed-item-section v-bind:items="products" type-name="" :user-group="1"
                           @addItem="showProductsDialog"
                           @deleteItem="showSureProduct"
                           @editItem="showProductsEditDialog"
