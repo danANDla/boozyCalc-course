@@ -20,7 +20,7 @@
       </div>
       <div class="item">
         <router-link to="/items" v-slot="{ href, navigate}">
-          <menu-nav-button :href="href" @click="navigate">Ingredients | Cocktails</menu-nav-button>
+          <menu-nav-button :href="href" @click="navigate">Cocktails</menu-nav-button>
         </router-link>
       </div>
     </div>
