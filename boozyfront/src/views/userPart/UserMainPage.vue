@@ -63,7 +63,7 @@ nav {
 
 main {
   grid-area: content;
-  padding: 10px;
+  padding: 0px 10px 10px 10px;
   overflow-y: scroll;
   overflow-x: hidden;
 }

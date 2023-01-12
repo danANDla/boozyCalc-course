@@ -129,6 +129,7 @@ export default {
     },
     showCocktailsInfo(id){
       this.cocktailsInfoVisible = true
+      console.log("showing")
       this.currentCocktail = this.cocktails.find(x => x.id === id)
     },
     getTypeName(id){

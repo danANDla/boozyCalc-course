@@ -3,7 +3,7 @@
     <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
          :ref="setItemRef">
 
-      <div v-if="page==='cocktails'" class="cocktail-container">
+      <div v-if="page==='cocktails'" class="cocktail-container" @click="showItem(item.id)">
         <div class="item-name"> {{ item.name }} </div>
         <div class="item-recipe">
           {{getIngredientsString(item.ingredients)}}
@@ -209,7 +209,8 @@ export default {
   display: flex;
   flex-direction: column;
   width: 50%;
-  padding: 10px;
+  padding: 10px 10px 10px 10px;
+  cursor: pointer;
 }
 
 .item-recipe{
