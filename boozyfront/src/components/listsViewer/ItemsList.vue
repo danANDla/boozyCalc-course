@@ -5,12 +5,7 @@
 
       <div v-if="page==='cocktails'" class="cocktail-container" @click="showItem(item.id)">
         <div class="item-name"> {{ item.name }} </div>
-        <div class="item-recipe">
-          {{getIngredientsString(item.ingredients)}}
-<!--          <div v-for="(ingr,index) in item.ingredients">-->
-<!--            {{this.ingredients.find(x => x.id == ingr.ingredientId).name}}-->
-<!--          </div>-->
-        </div>
+        <div class="item-recipe"> {{getIngredientsString(item.ingredients)}} </div>
       </div>
       <div v-else class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
@@ -125,7 +120,6 @@ export default {
 
 <style scoped>
 .list-container {
-  padding: 10px;
   display: flex;
   width: 100%;
   flex-direction: column;
@@ -141,12 +135,17 @@ export default {
   height: fit-content;
   display: flex;
   transition: all 0.2s;
+  padding-left: 10px;
+}
+
+.item-container:hover{
+  background-color: white;
+  color: black;
 }
 
 .red-item-container {
   background-color: darkred;
   font-size: 20px;
-  border: darkred 1px solid;
   height: fit-content;
   display: flex;
   transition: all 0.5s;
@@ -155,7 +154,6 @@ export default {
 .tan-item-container {
   background-color: tan;
   font-size: 20px;
-  border: tan 1px solid;
   height: fit-content;
   display: flex;
   transition: all 0.5s;
@@ -208,13 +206,16 @@ export default {
 .cocktail-container{
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 100%;
   padding: 10px 10px 10px 10px;
   cursor: pointer;
 }
 
 .item-recipe{
   display: flex;
+  width: 50%;
+  padding: 5px 0px 0px 5px;
+  font-weight: lighter;
 }
 
 .item-name {
