@@ -18,6 +18,8 @@
                           v-bind:items="this.cocktails.filter(x => x.type_id === item)"
                           :type-name="getTypeName(item)"
                           :user-group="0"
+                          v-bind:page="'cocktails'"
+                          v-bind:ingredients="ingredients"
                           @showItem="showCocktailsInfo"></typed-item-section>
 <!--        <div v-for="item in this.distinctTypes" :key="item"> {{item}} </div>-->
     </div>
@@ -117,7 +119,6 @@ export default {
       try {
         const response = await axios.get(this.api_url + 'cocktails/distinctTypes')
         this.distinctTypes = response.data;
-        console.log(this.distinctTypes)
 
       } catch (e) {
         alert(e.message)
@@ -128,11 +129,9 @@ export default {
     },
     showCocktailsInfo(id){
       this.cocktailsInfoVisible = true
-      console.log('showCocktailsInfo', id)
       this.currentCocktail = this.cocktails.find(x => x.id === id)
     },
     getTypeName(id){
-      console.log(this.cocktailTypes.find(x => x.id === id).name);
       return this.cocktailTypes.find(x => x.id === id).name
     },
     getDataFromApi () {

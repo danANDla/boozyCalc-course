@@ -74,7 +74,7 @@ public class CocktailService {
                 newCocktail.getName(),
                 newCocktail.getDescription(),
                 newCocktail.getRecipe(),
-                1L
+                newCocktail.getType_id()
         );
         CocktailEntity saved = cocktailRepo.save(cocktailEntity);
         for (WeightedIngredientModel i : newCocktail.getIngredients()) {

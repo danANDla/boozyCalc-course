@@ -3,7 +3,16 @@
     <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
          :ref="setItemRef">
 
-      <div class="item-body" @click="showItem(item.id)">
+      <div v-if="page==='cocktails'" class="cocktail-container">
+        <div class="item-name"> {{ item.name }} </div>
+        <div class="item-recipe">
+          {{getIngredientsString(item.ingredients)}}
+<!--          <div v-for="(ingr,index) in item.ingredients">-->
+<!--            {{this.ingredients.find(x => x.id == ingr.ingredientId).name}}-->
+<!--          </div>-->
+        </div>
+      </div>
+      <div v-else class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
           <div class="item-name">{{ item.name }}</div>
           <div class="item-info"> {{ item.ingredientName }}</div>
@@ -35,8 +44,10 @@
 </template>
 
 <script>
+import DialogWindow from "@/components/UI/DialogWindow";
 export default {
   name: "ItemsList",
+  components: {DialogWindow},
   props: {
     items: {
       type: Array,
@@ -94,6 +105,16 @@ export default {
     },
     makeNotWhite: function (index) {
       this.isColor[index] = 0
+    },
+    getIngredientsString(arr){
+      let retStr = ""
+      for(var i = 0; i < arr.length - 1; i++){
+        retStr += this.ingredients.find(x => x.id === arr[i].ingredientId).name
+        retStr += ", "
+      }
+      retStr += this.ingredients.find(x => x.id === arr[arr.length - 1].ingredientId).name
+      console.log(retStr)
+      return retStr
     }
   },
   beforeUpdate() {
@@ -116,9 +137,7 @@ export default {
 }
 
 .item-container, .add-item-btn-container {
-  background-color: #69AAB8;
   font-size: 20px;
-  border: skyblue 1px solid;
   height: fit-content;
   display: flex;
   transition: all 0.2s;
@@ -173,6 +192,7 @@ export default {
 
 .item-body{
   width: 100%;
+  user-select: none;
 }
 
 .item-body  div{
@@ -185,8 +205,19 @@ export default {
   height: 100%;
 }
 
+.cocktail-container{
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  padding: 10px;
+}
+
+.item-recipe{
+  display: flex;
+}
+
 .item-name {
   font-size: x-large;
-  font-weight: bold;
+  font-weight: normal;
 }
 </style>

@@ -59,18 +59,24 @@ export default {
 
 <style scoped>
 .section-container {
-  background-color: #576163;
+  background-color: #2A2F30;
   display: flex;
   flex-direction: column;
+  padding: 15px;
 }
 
 .section-header {
   font-size: 30px;
   padding: 10px;
+  background-color: #69AAB8;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  width: fit-content;
+  user-select: none;
 }
 
-.section-body {
-  padding: 10px;
-}
 
+.section-body{
+  background-color: #576163;
+}
 </style>
