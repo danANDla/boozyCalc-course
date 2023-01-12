@@ -12,4 +12,7 @@ public interface CocktailRepo extends CrudRepository<CocktailEntity, Long> {
 
     @Query(value = "SELECT * FROM cocktails", nativeQuery = true)
     List<CocktailEntity> findAll();
+
+    @Query(value = "SELECT DISTINCT type_id FROM cocktails", nativeQuery = true)
+    List<Long> findAllTypes();
 }

@@ -58,6 +58,11 @@ public class CocktailService {
         return list;
     }
 
+    public List<Long> getAllDistinctTypes() {
+        List<Long> list = cocktailRepo.findAllTypes();
+        return list;
+    }
+
     public CocktailEntity addCocktail(CocktailModel newCocktail) throws ItemNameUsedException, ItemIdNotFoundException {
         if (cocktailRepo.findByName(newCocktail.getName()) != null)
             throw new ItemNameUsedException("cocktail with this name already exists");

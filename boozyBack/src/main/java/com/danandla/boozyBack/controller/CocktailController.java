@@ -38,6 +38,16 @@ public class CocktailController {
         }
     }
 
+    @GetMapping("/distinctTypes")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getDistinctTypes() {
+        try {
+            return ResponseEntity.ok(cocktailService.getAllDistinctTypes());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity addCocktail(@RequestBody CocktailModel newCocktail) {

@@ -14,9 +14,12 @@
       />
     </div>
     <div>
-      <typed-item-section v-bind:items="cocktails" type-name=""
+      <typed-item-section v-for="(item,index) in distinctTypes"
+                          v-bind:items="this.cocktails.filter(x => x.type_id === item)"
+                          :type-name="getTypeName(item)"
                           :user-group="0"
                           @showItem="showCocktailsInfo"></typed-item-section>
+<!--        <div v-for="item in this.distinctTypes" :key="item"> {{item}} </div>-->
     </div>
   </div>
 </template>
@@ -56,6 +59,7 @@ export default {
       ingredients: this.$store.state.items.ingredients,
       cocktails: this.$store.state.items.cocktails,
       products: this.$store.state.items.products,
+      cocktailTypes: this.$store.state.items.cocktailTypes,
       api_url: "http://127.0.0.1:8080/api/",
       page: 'cocktails',
 
@@ -64,6 +68,8 @@ export default {
       currentCocktail: undefined,
 
       cocktailsInfoVisible: false,
+
+      distinctTypes: []
     }
   },
   methods: {
@@ -97,6 +103,26 @@ export default {
         alert(e.message)
       }
     },
+    async fetchCocktailTypes() {
+      try {
+        const response = await axios.get(this.api_url + 'cocktails/allTypes')
+        console.log(response)
+        this.$store.commit("items/updateCocktailTypes", response.data)
+        this.cocktailTypes = this.$store.state.items.cocktailTypes
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async getAllTypes() {
+      try {
+        const response = await axios.get(this.api_url + 'cocktails/distinctTypes')
+        this.distinctTypes = response.data;
+        console.log(this.distinctTypes)
+
+      } catch (e) {
+        alert(e.message)
+      }
+    },
     tabsHandler: function (r) {
       this.page = r.tab.toLowerCase()
     },
@@ -105,12 +131,34 @@ export default {
       console.log('showCocktailsInfo', id)
       this.currentCocktail = this.cocktails.find(x => x.id === id)
     },
+    getTypeName(id){
+      console.log(this.cocktailTypes.find(x => x.id === id).name);
+      return this.cocktailTypes.find(x => x.id === id).name
+    },
+    getDataFromApi () {
+      this.loading = true
+      this.fetchIngredients()
+      this.fetchCocktails()
+      this.fetchProducts()
+      this.fetchCocktailTypes()
+      this.getAllTypes()
+      // return this.fetchIngredients().then(items => {
+      //   this.fetchCocktails().then( items =>{
+      //     this.fetchCocktailTypes().then(items =>{
+      //       this.fetchProducts().then(items =>{
+      //         this.getAllTypes()
+      //       })
+      //     })
+      //   })
+      //   // You might use this at some stage: const { sortBy, descending, page, rowsPerPage } = this.pagination
+      //   this.loading = false;
+      // });
+    }
   },
   mounted() {
     console.log("Fetching")
-    this.fetchIngredients()
-    this.fetchCocktails()
-    this.fetchProducts()
+    this.getDataFromApi()
+    console.log("Fetched")
   }
 }
 </script>
