@@ -24,6 +24,7 @@
                          :is-error="cocksAddIsError"
                          :error-text="cocksAddErrorText"
                          :ingredients="ingredients"
+                         :cocktail-types="cocktailTypes"
                          :prev-cocktail="currentCocktail">
       </add-cocktail-form>
     </div>
@@ -131,6 +132,7 @@ export default {
       ingredients: this.$store.state.items.ingredients,
       cocktails: this.$store.state.items.cocktails,
       products: this.$store.state.items.products,
+      cocktailTypes: this.$store.state.items.cocktailTypes,
       api_url: "http://127.0.0.1:8080/api/",
       page: 'cocktails',
 
@@ -188,6 +190,16 @@ export default {
         console.log(response)
         this.$store.commit("items/updateProducts", response.data)
         this.products = this.$store.state.items.products
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async fetchCocktailTypes() {
+      try {
+        const response = await axios.get(this.api_url + 'cocktails/allTypes')
+        console.log(response)
+        this.$store.commit("items/updateCocktailTypes", response.data)
+        this.cocktailTypes = this.$store.state.items.cocktailTypes
       } catch (e) {
         alert(e.message)
       }
@@ -446,6 +458,7 @@ export default {
     this.fetchIngredients()
     this.fetchCocktails()
     this.fetchProducts()
+    this.fetchCocktailTypes()
   }
 }
 </script>

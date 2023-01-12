@@ -1,7 +1,7 @@
 package com.danandla.boozyBack.service;
 
 import com.danandla.boozyBack.entity.CocktailEntity;
-import com.danandla.boozyBack.entity.ProductEntity;
+import com.danandla.boozyBack.entity.CocktailTypeEntity;
 import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
@@ -9,6 +9,7 @@ import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.model.CocktailModel;
 import com.danandla.boozyBack.model.WeightedIngredientModel;
 import com.danandla.boozyBack.repository.CocktailRepo;
+import com.danandla.boozyBack.repository.CocktailTypeRepo;
 import com.danandla.boozyBack.repository.IngredientRepo;
 import com.danandla.boozyBack.repository.RecipeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class CocktailService {
     private CocktailRepo cocktailRepo;
 
     @Autowired
+    private CocktailTypeRepo typeRepo;
+
+    @Autowired
     private IngredientRepo ingredientRepo;
 
     @Autowired
@@ -31,21 +35,27 @@ public class CocktailService {
     public List<CocktailModel> getAllCocktails() {
         List<CocktailEntity> list = (List<CocktailEntity>) cocktailRepo.findAll();
         ArrayList<CocktailModel> retList = new ArrayList<>();
-        for(CocktailEntity i: list){
-           List<RecipeEntity> recipe = recipeRepo.findByCocktailId(i.getId());
-           ArrayList<WeightedIngredientModel> ingredients = new ArrayList<>();
-           for(RecipeEntity j: recipe) ingredients.add(new WeightedIngredientModel(j.getIngredient_id(), j.getQuantity()));
-           CocktailModel cocktail = new CocktailModel(
-                   i.getId(),
-                   i.getName(),
-                   i.getDescription(),
-                   i.getRecipe(),
-                   i.getType_id(),
-                   ingredients
-           );
-           retList.add(cocktail);
+        for (CocktailEntity i : list) {
+            List<RecipeEntity> recipe = recipeRepo.findByCocktailId(i.getId());
+            ArrayList<WeightedIngredientModel> ingredients = new ArrayList<>();
+            for (RecipeEntity j : recipe)
+                ingredients.add(new WeightedIngredientModel(j.getIngredient_id(), j.getQuantity()));
+            CocktailModel cocktail = new CocktailModel(
+                    i.getId(),
+                    i.getName(),
+                    i.getDescription(),
+                    i.getRecipe(),
+                    i.getType_id(),
+                    ingredients
+            );
+            retList.add(cocktail);
         }
         return retList;
+    }
+
+    public List<CocktailTypeEntity> getAllTypes() {
+        List<CocktailTypeEntity> list = typeRepo.findAll();
+        return list;
     }
 
     public CocktailEntity addCocktail(CocktailModel newCocktail) throws ItemNameUsedException, ItemIdNotFoundException {
@@ -70,7 +80,8 @@ public class CocktailService {
     }
 
     public CocktailEntity editCocktail(CocktailModel newCocktail) throws ItemIdNotFoundException, IllegalArgumentException {
-        if(cocktailRepo.findById(newCocktail.getId()).isEmpty()) throw new ItemIdNotFoundException("cocktail with this id was not found");
+        if (cocktailRepo.findById(newCocktail.getId()).isEmpty())
+            throw new ItemIdNotFoundException("cocktail with this id was not found");
         CocktailEntity cocktail = cocktailRepo.findById(newCocktail.getId()).get();
         cocktail.setName(newCocktail.getName());
         cocktail.setDescription(newCocktail.getDescription());
@@ -94,7 +105,6 @@ public class CocktailService {
         if (t != null) {
             cocktailRepo.deleteById(cocktailId);
             return cocktailId;
-        }
-        else throw new ItemNameNotFoundException("cocktail with this id wasn't found");
+        } else throw new ItemNameNotFoundException("cocktail with this id wasn't found");
     }
 }

@@ -2,7 +2,8 @@ export const itemsModule = {
     state: () => ({
         ingredients: [],
         cocktails: [],
-        products: []
+        products: [],
+        cocktailTypes: []
     }),
     getters: {
         getIngredients(state) {
@@ -13,6 +14,9 @@ export const itemsModule = {
         },
         getProducts(state){
             return state.products
+        },
+        getCocktailTypes(state){
+            return state.cocktailTypes
         }
     },
     mutations: {
@@ -24,6 +28,9 @@ export const itemsModule = {
         },
         updateProducts(state, newArray){
             state.products = newArray
+        },
+        updateCocktailTypes(state, newArray){
+            state.cocktailTypes = newArray
         }
     },
     actions: {},

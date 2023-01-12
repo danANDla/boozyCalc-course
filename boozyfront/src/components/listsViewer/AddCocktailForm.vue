@@ -18,6 +18,13 @@
             placeholder="description"
         />
       </div>
+      <div>
+        <drop-down v-bind:value="this.cocktail.type_id"
+                   v-on:change="this.cocktail.type_id = parseInt($event.target.value)"
+                   :itemList="cocktailTypes">
+          choose type of cocktail
+        </drop-down>
+      </div>
       <div class="recipe">
         <div>
           recipe
@@ -57,6 +64,10 @@ export default {
       type: Array,
       default: ""
     },
+    cocktailTypes:{
+      type: Array,
+      required: true
+    },
     prevCocktail:{
       required: false
     }
@@ -68,7 +79,7 @@ export default {
         description: '',
         ingredients: [],
         id: undefined,
-        type_id: 1
+        type_id: undefined
       },
       isEdit: false
     }
@@ -88,6 +99,7 @@ export default {
       this.cocktail.description = this.prevCocktail.description;
       this.cocktail.id = this.prevCocktail.id;
       this.cocktail.ingredients = this.prevCocktail.ingredients;
+      this.cocktail.type_id = this.prevCocktail.type_id;
       this.isEdit = true;
     }
   }
