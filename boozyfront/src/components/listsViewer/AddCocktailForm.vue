@@ -30,7 +30,7 @@
           recipe
         </div>
         <div>
-          <item-picker :item-list="ingredients" v-model:pickedItems="this.cocktail.ingredients"> </item-picker>
+          <item-picker :item-list="ingredients" :page="'cocktails'" v-model:pickedItems="this.cocktail.ingredients"> </item-picker>
         </div>
       </div>
       <div class="btn-container" v-if="!isEdit">

@@ -1,16 +1,22 @@
 package com.danandla.boozyBack.service;
 
+import com.danandla.boozyBack.entity.CocktailEntity;
 import com.danandla.boozyBack.entity.MenuEntity;
 import com.danandla.boozyBack.entity.PartyEntity;
+import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
+import com.danandla.boozyBack.model.PartyModel;
+import com.danandla.boozyBack.model.WeightedIngredientModel;
+import com.danandla.boozyBack.repository.CocktailRepo;
 import com.danandla.boozyBack.repository.MenuRepo;
 import com.danandla.boozyBack.repository.PartyRepo;
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 @Service
@@ -21,6 +27,9 @@ public class PartyService {
 
     @Autowired
     MenuRepo menuRepo;
+
+    @Autowired
+    CocktailRepo cocktailRepo;
 
     public ArrayList<PartyEntity> getAllParties() {
         ArrayList<PartyEntity> list = (ArrayList<PartyEntity>) partiesRepo.findAll();
@@ -35,13 +44,30 @@ public class PartyService {
         } else throw new ItemNameNotFoundException("party with this id wasn't found");
     }
 
-    public PartyEntity addParty(PartyEntity newParty) throws ItemNameUsedException {
+    public PartyEntity addParty(PartyModel newParty) throws ItemNameUsedException, ItemIdNotFoundException {
         if (partiesRepo.findByName(newParty.getName()) != null)
-            throw new ItemNameUsedException("ingredient with this name already exists");
-        return partiesRepo.save(newParty);
+            throw new ItemNameUsedException("party with this name already exists");
+        for (Long i : newParty.getMenu()) {
+            if (cocktailRepo.findById(i).isEmpty())
+                throw new ItemIdNotFoundException("cocktail with this id was not found");
+
+        }
+        System.out.println(newParty.getDate());
+        PartyEntity party = new PartyEntity(
+                newParty.getName(),
+                newParty.getDate(),
+                newParty.getLocation(),
+                newParty.getDescription()
+        );
+        PartyEntity saved = partiesRepo.save(party);
+        for (Long i : newParty.getMenu()) {
+            MenuEntity menu = new MenuEntity(saved.getId(), i);
+            menuRepo.save(menu);
+        }
+        return saved;
     }
 
-    public PartyEntity editParty(PartyEntity newParty) throws ItemIdNotFoundException, IllegalArgumentException {
+    public PartyEntity editParty(PartyModel newParty) throws ItemIdNotFoundException, IllegalArgumentException {
         if (partiesRepo.findById(newParty.getId()).isEmpty())
             throw new ItemIdNotFoundException("party with this id was not found");
         PartyEntity party = partiesRepo.findById(newParty.getId()).get();

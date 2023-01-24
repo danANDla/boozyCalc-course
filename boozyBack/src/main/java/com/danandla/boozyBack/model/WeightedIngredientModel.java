@@ -7,6 +7,10 @@ public class WeightedIngredientModel {
     Long ingredientId;
     float amount;
 
+    public WeightedIngredientModel() {
+
+    }
+
     public Long getIngredientId() {
         return ingredientId;
     }

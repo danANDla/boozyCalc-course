@@ -107,6 +107,7 @@ export default {
       this.currentParty = this.parties.find(x => x.id === id)
     },
     async sendParty(args) {
+      console.log(args)
       let newParty = args.party
       let badNewItem = false
       if (newParty.menu.length === 0) {
@@ -123,11 +124,16 @@ export default {
         badNewItem = true
         this.partyAddErrorText = "empty name field"
       }
+      if (newParty.location === "") {
+        this.partyAddIsError = true
+        badNewItem = true
+        this.partyAddErrorText = "empty location field"
+      }
       if (!badNewItem) {
         console.log(newParty)
         let status = false
         let errorText = ""
-        await axios.post(this.api_url + 'partys/' + args.url, newParty)
+        await axios.post(this.api_url + 'parties/' + args.url, newParty)
             .then(function (response) {
               status = true;
               console.log(response.status.valueOf())
@@ -148,7 +154,8 @@ export default {
         } else {
           console.log("is Error")
           this.partyAddIsError = true
-          this.partyAddErrorText = errorText
+          if (typeof errorText !== 'string') errorText = 'server error'
+          this.partyAddErrorText = errorText.substring(0, Math.min(errorText.length, 200))
         }
       }
     },
@@ -185,4 +192,7 @@ export default {
 
 <style scoped>
 
+.form-container {
+  width: 350px;
+}
 </style>

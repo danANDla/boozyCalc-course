@@ -2,14 +2,21 @@
   <div class="picker-container">
     <div :class="[this.isRed[index]===0 ? itemContainer : redItemContainer]" v-for="(item,index) in pickedItems"
          :ref="setItemRef">
-      <div>
+      <div v-if="page === 'cocktails'">
         <drop-down v-bind:value="pickedItems[index].ingredientId"
                    v-on:change="pickedItems[index].ingredientId = parseInt($event.target.value)"
                    :itemList="itemList">
           choose ingredient
         </drop-down>
       </div>
-      <div>
+      <div v-else>
+        <drop-down v-bind:value="pickedItems[index]"
+                   v-on:change="pickedItems[index] = parseInt($event.target.value)"
+                   :itemList="itemList">
+          choose cocktail
+        </drop-down>
+      </div>
+      <div v-if="this.page === 'cocktails'">
         <my-input
             v-model="pickedItems[index].amount"
             type="number"
@@ -24,7 +31,10 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem">
+    <div class="add-item-btn-container" v-if="page === 'cocktails'" @click="addItem('cocktails')">
+      <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
+    </div>
+    <div class="add-item-btn-container" v-else @click="addItem('party')">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
   </div>
@@ -41,10 +51,14 @@ export default {
       type: Array,
       required: true
     },
+    page: {
+      type: String,
+      required: true
+    },
     pickedItems:{
       type: Array,
       default: () => []
-    }
+    },
   },
   data(){
     return{
@@ -71,8 +85,9 @@ export default {
     makeNotRed: function (index) {
       this.isRed[index] = 0
     },
-    addItem:function (){
-      this.pickedItems.push({ingredientId: -1, amount: ""})
+    addItem:function (sel){
+      if (sel === 'cocktails') this.pickedItems.push({ingredientId: -1, amount: ""})
+      else this.pickedItems.push(-1)
     }
   }
 }

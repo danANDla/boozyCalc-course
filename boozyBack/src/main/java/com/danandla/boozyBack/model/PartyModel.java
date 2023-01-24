@@ -1,28 +1,26 @@
-package com.danandla.boozyBack.entity;
-
-import jakarta.persistence.*;
+package com.danandla.boozyBack.model;
 
 import java.sql.Timestamp;
+import java.util.List;
 
-@Entity
-@Table(name = "parties")
-public class PartyEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PartyModel {
     private Long id;
     private String name;
-    private java.sql.Timestamp event_date;
+    private java.sql.Timestamp date;
     private String location;
     private String description;
+    private List<Long> menu;
 
-    public PartyEntity() {
+    public PartyModel() {
     }
 
-    public PartyEntity(String name, Timestamp date, String location, String description) {
+    public PartyModel(Long id, String name, Timestamp date, String location, String description, List<Long> menu) {
+        this.id = id;
         this.name = name;
-        this.event_date = date;
+        this.date = date;
         this.location = location;
         this.description = description;
+        this.menu = menu;
     }
 
     public Long getId() {
@@ -42,11 +40,11 @@ public class PartyEntity {
     }
 
     public Timestamp getDate() {
-        return event_date;
+        return date;
     }
 
     public void setDate(Timestamp date) {
-        this.event_date = date;
+        this.date = date;
     }
 
     public String getLocation() {
@@ -63,5 +61,13 @@ public class PartyEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Long> getMenu() {
+        return menu;
+    }
+
+    public void setMenu(List<Long> menu) {
+        this.menu = menu;
     }
 }

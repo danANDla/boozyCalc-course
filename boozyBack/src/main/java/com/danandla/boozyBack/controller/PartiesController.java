@@ -4,6 +4,7 @@ import com.danandla.boozyBack.entity.PartyEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
+import com.danandla.boozyBack.model.PartyModel;
 import com.danandla.boozyBack.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +53,7 @@ public class PartiesController {
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:8081")
-    public ResponseEntity addParty(@RequestBody PartyEntity newParty) {
+    public ResponseEntity addParty(@RequestBody PartyModel newParty) {
         try {
             partyService.addParty(newParty);
             return ResponseEntity.ok("party successfully added");
@@ -65,7 +66,7 @@ public class PartiesController {
 
     @PostMapping("/edit")
     @CrossOrigin(origins = "http://localhost:8081")
-    public ResponseEntity editParty(@RequestBody PartyEntity newParty) {
+    public ResponseEntity editParty(@RequestBody PartyModel newParty) {
         try {
             partyService.editParty(newParty);
             return ResponseEntity.ok("party successfully added");

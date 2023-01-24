@@ -15,7 +15,7 @@
         </div>
         <div v-else-if="page==='parties'">
             <div class="item-name">{{ item.name }}</div>
-            <div class="item-info"> {{ item.date }}</div>
+            <div class="item-info"> {{ formatDate(item.date) }}</div>
           <div class="item-info"> {{ item.location }}</div>
         </div>
         <div v-else>
@@ -115,6 +115,17 @@ export default {
       retStr += this.ingredients.find(x => x.id === arr[arr.length - 1].ingredientId).name
       console.log(retStr)
       return retStr
+    },
+    formatDate(date){
+      var day = new Date(Date.parse(date)).getDate()
+      var month = new Date(Date.parse(date)).getMonth() + 1
+      if (day < 10){
+        day = '0' + day
+      }
+      if (month < 10){
+        month = '0' + month
+      }
+      return day + "." + month
     }
   },
   beforeUpdate() {
@@ -154,6 +165,7 @@ export default {
   height: fit-content;
   display: flex;
   transition: all 0.5s;
+  padding-left: 10px;
 }
 
 .tan-item-container {
@@ -162,6 +174,7 @@ export default {
   height: fit-content;
   display: flex;
   transition: all 0.5s;
+  padding-left: 10px;
 }
 
 .add-item-btn-container {
