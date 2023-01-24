@@ -27,7 +27,8 @@
       </div>
       <div>
         <my-input
-            v-model="party.date"
+            v-model="date"
+            @change="updateDate(this.date)"
             type="text"
             placeholder="date"
         />
@@ -84,24 +85,31 @@ export default {
         location: '',
         menu: [],
         id: undefined,
-        date: null
+        date: undefined
       },
       isEdit: false,
-      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+          + ' '
+          + (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(11, 5),
     }
   },
   methods: {
     submitData() {
-      this.party.date = new Date(Date.now())
       this.$emit('submitData', {party: this.party, url: 'add'})
     },
 
     editData() {
       this.$emit('submitData', {party: this.party, url: 'edit'})
     },
+    updateDate(newDate){
+      console.log(newDate)
+      this.party.date = new Date(Date.parse(newDate))
+      console.log(this.party.date)
+    }
   },
   mounted() {
     if (this.prevParty !== undefined) {
+      console.log("is edit")
       this.party.name = this.prevParty.name;
       this.party.description = this.prevParty.description;
       this.party.id = this.prevParty.id;

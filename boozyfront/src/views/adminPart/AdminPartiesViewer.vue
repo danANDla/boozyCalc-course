@@ -7,7 +7,7 @@
                            :is-error="partyAddIsError"
                            :error-text="partyAddErrorText"
                            :cocktails="cocktails"
-                           :prev-cocktail="currentParty">
+                           :prev-party="currentParty">
         </add-party-form>
       </div>
     </dialog-window>
@@ -60,13 +60,9 @@ export default {
       console.log('show party', id)
       router.push({name: 'partyInfo', params: {id: id}});
     },
-    editParty(id){
-      console.log('edit party', id)
-    },
     async fetchCocktails() {
       try {
         const response = await axios.get(this.api_url + 'cocktails/all')
-        console.log(response)
         this.$store.commit("items/updateCocktails", response.data)
         this.cocktails = this.$store.state.items.cocktails
       } catch (e) {
@@ -76,7 +72,6 @@ export default {
     async fetchParties() {
       try {
         const response = await axios.get(this.api_url + 'parties/all')
-        console.log(response)
         this.$store.commit("items/updateParties", response.data)
         this.parties = this.$store.state.items.parties
       } catch (e) {
@@ -84,13 +79,13 @@ export default {
       }
     },
     showPartyDialog() {
+      this.currentParty = undefined
       this.partyAddIsError = false
       this.partyAddErrorText = ""
       this.partyDialogVisible = true
     },
     showPartyEditDialog(id) {
       this.currentParty = this.parties.find(x => x.id === id)
-      console.log(this.currentParty)
       this.partyAddIsError = false
       this.partyAddErrorText = ""
       this.partyDialogVisible = true
@@ -130,13 +125,11 @@ export default {
         this.partyAddErrorText = "empty location field"
       }
       if (!badNewItem) {
-        console.log(newParty)
         let status = false
         let errorText = ""
         await axios.post(this.api_url + 'parties/' + args.url, newParty)
             .then(function (response) {
               status = true;
-              console.log(response.status.valueOf())
             })
             .catch(function (error) {
               if (error.response) {
@@ -161,7 +154,6 @@ export default {
     },
     async deleteParty(id) {
       const response = await axios.delete(this.api_url + 'parties?id=' + id)
-      console.log(response)
       await this.fetchParties()
     },
     showSureParty(id, name) {
@@ -170,7 +162,6 @@ export default {
       this.partySureVisible = true
     },
     sure: function (type, id) {
-        console.log(type + ' ' + id)
         this.deleteParty(id)
         this.partySureVisible = false
         this.partSureId = -1
@@ -183,7 +174,6 @@ export default {
     },
   },
   mounted() {
-    console.log("fetching")
     this.fetchCocktails()
     this.fetchParties()
   }
