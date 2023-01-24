@@ -1,0 +1,63 @@
+package com.danandla.boozyBack.service;
+
+import com.danandla.boozyBack.entity.MenuEntity;
+import com.danandla.boozyBack.entity.PartyEntity;
+import com.danandla.boozyBack.exception.ItemIdNotFoundException;
+import com.danandla.boozyBack.exception.ItemNameNotFoundException;
+import com.danandla.boozyBack.exception.ItemNameUsedException;
+import com.danandla.boozyBack.repository.MenuRepo;
+import com.danandla.boozyBack.repository.PartyRepo;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+
+@Service
+public class PartyService {
+
+    @Autowired
+    PartyRepo partiesRepo;
+
+    @Autowired
+    MenuRepo menuRepo;
+
+    public ArrayList<PartyEntity> getAllParties() {
+        ArrayList<PartyEntity> list = (ArrayList<PartyEntity>) partiesRepo.findAll();
+        return list;
+    }
+
+    public Long deleteById(Long partyId) throws ItemNameNotFoundException {
+        PartyEntity t = partiesRepo.findById(partyId).get();
+        if (t != null) {
+            partiesRepo.deleteById(partyId);
+            return partyId;
+        } else throw new ItemNameNotFoundException("party with this id wasn't found");
+    }
+
+    public PartyEntity addParty(PartyEntity newParty) throws ItemNameUsedException {
+        if (partiesRepo.findByName(newParty.getName()) != null)
+            throw new ItemNameUsedException("ingredient with this name already exists");
+        return partiesRepo.save(newParty);
+    }
+
+    public PartyEntity editParty(PartyEntity newParty) throws ItemIdNotFoundException, IllegalArgumentException {
+        if (partiesRepo.findById(newParty.getId()).isEmpty())
+            throw new ItemIdNotFoundException("party with this id was not found");
+        PartyEntity party = partiesRepo.findById(newParty.getId()).get();
+        party.setDescription(newParty.getDescription());
+        party.setName(newParty.getName());
+        party.setLocation(newParty.getLocation());
+        party.setDate(newParty.getDate());
+        return partiesRepo.save(party);
+    }
+
+    public ArrayList<MenuEntity> getMenu(long partyId) throws ItemNameNotFoundException{
+        PartyEntity t = partiesRepo.findById(partyId).get();
+        if (t != null) {
+            ArrayList<MenuEntity> list = (ArrayList<MenuEntity>) menuRepo.findByPartId(partyId);
+            return list;
+        } else throw new ItemNameNotFoundException("party with this id wasn't found");
+    }
+
+}
