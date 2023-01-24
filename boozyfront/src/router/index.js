@@ -5,6 +5,8 @@ import UserListsViewer from "@/views/userPart/UserListsViewer";
 import WelcomePage from "@/views/WelcomePage";
 import UserMainPage from "@/views/userPart/UserMainPage";
 import Main from "@/views/Main"
+import AdminPartiesViewer from "@/views/adminPart/AdminPartiesViewer";
+import AdminPartyInfo from "@/views/adminPart/AdminPartyInfo";
 
 const routes = [
     {
@@ -31,6 +33,16 @@ const routes = [
                         path: "lists",
                         name: "items",
                         component: AdminListsViewer
+                    },
+                    {
+                        path: "parties",
+                        name: "parties",
+                        component: AdminPartiesViewer
+                    },
+                    {
+                        path: "party/:id",
+                        name: "partyInfo",
+                        component: AdminPartyInfo
                     },
                 ]
             },

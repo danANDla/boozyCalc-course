@@ -13,6 +13,11 @@
           <div class="item-info"> {{ item.ingredientName }}</div>
           <div class="item-info"> {{ item.price }}</div>
         </div>
+        <div v-else-if="page==='parties'">
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-info"> {{ item.date }}</div>
+          <div class="item-info"> {{ item.location }}</div>
+        </div>
         <div v-else>
           <div class="item-name">{{ item.name }}</div>
         </div>

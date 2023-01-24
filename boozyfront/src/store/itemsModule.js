@@ -3,7 +3,8 @@ export const itemsModule = {
         ingredients: [],
         cocktails: [],
         products: [],
-        cocktailTypes: []
+        cocktailTypes: [],
+        parties: []
     }),
     getters: {
         getIngredients(state) {
@@ -17,6 +18,9 @@ export const itemsModule = {
         },
         getCocktailTypes(state){
             return state.cocktailTypes
+        },
+        getParties(state){
+            return state.parties
         }
     },
     mutations: {
@@ -31,6 +35,9 @@ export const itemsModule = {
         },
         updateCocktailTypes(state, newArray){
             state.cocktailTypes = newArray
+        },
+        updateParties(state, newParty){
+            state.parties = newParty
         }
     },
     actions: {},
