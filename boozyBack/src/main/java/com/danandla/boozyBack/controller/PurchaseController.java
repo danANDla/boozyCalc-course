@@ -4,10 +4,7 @@ package com.danandla.boozyBack.controller;
 import com.danandla.boozyBack.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/purchases")
@@ -26,4 +23,13 @@ public class PurchaseController {
         }
     }
 
+    @GetMapping("/party")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getPurchasesByParty(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(purchaseService.getPurchasesByParty(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

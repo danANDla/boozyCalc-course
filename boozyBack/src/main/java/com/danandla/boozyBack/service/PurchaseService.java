@@ -18,4 +18,9 @@ public class PurchaseService {
         ArrayList<PurchaseEntity> list = (ArrayList<PurchaseEntity>) purchaseRepo.findAll();
         return list;
     }
+
+    public ArrayList<PurchaseEntity> getPurchasesByParty(Long id) {
+        ArrayList<PurchaseEntity> list = (ArrayList<PurchaseEntity>) purchaseRepo.findByParty(id);
+        return list;
+    }
 }
