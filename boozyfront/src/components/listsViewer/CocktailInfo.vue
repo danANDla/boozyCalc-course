@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <div class="info-block" v-if="this.cocktail.description !== null">
+      <div class="info-block" v-if="this.cocktail.description !== null && this.cocktail.description !== ''">
         <div class="info-header">description</div>
         <div class="info-body">
           <div>
@@ -29,6 +29,7 @@
 
 <script>
 import DialogWindow from "@/components/UI/DialogWindow";
+import axios from "axios";
 export default {
   name: "CocktailInfo",
   components: {DialogWindow},
@@ -36,17 +37,27 @@ export default {
     cocktail: {
       required: true
     },
-    ingredients:{
-      type: Array,
-      required: true
-    }
   },
   data() {
     return {
+      ingredients: this.$store.state.items.ingredients,
+      api_url: "http://127.0.0.1:8080/api/",
+    }
+  },
+  methods:{
+    async fetchIngredients() {
+      try {
+        const response = await axios.get(this.api_url + 'ingredients/all')
+        console.log(response)
+        this.$store.commit("items/updateIngredients", response.data)
+        this.ingredients = this.$store.state.items.ingredients
+      } catch (e) {
+        alert(e.message)
+      }
     }
   },
   mounted() {
-    console.log(this.cocktail)
+    this.fetchIngredients()
   }
 }
 </script>
@@ -58,7 +69,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 40vw;
+  min-width: 30vw;
   height: 50vh;
   max-width: 60vw;
 }

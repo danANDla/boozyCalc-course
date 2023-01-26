@@ -9,7 +9,7 @@
         <div class="item-name"> {{ item.name }}</div>
         <div class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
       </div>
-      <div v-else-if="page==='menu'" class="cocktail-container" @click="showItem(item.id)">
+      <div v-else-if="page==='menu'" class="cocktail-container" @click="showItem(item)">
         <div class="item-name">{{ cocktails.find(x => x.id === item).name }}</div>
         <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
       </div>

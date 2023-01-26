@@ -12,12 +12,19 @@
       <div>INVITES</div>
     </div>
 
+    <dialog-window v-model:show="cocktailInfoVisible">
+      <div class="info-container">
+        <cocktail-info :cocktail="currentCocktail"></cocktail-info>
+      </div>
+    </dialog-window>
+
     <div class="party-items">
       <div>MENU</div>
       <div class="list-container">
         <items-list :items="party.menu"
                     :page="'menu'"
-                    :user-group="1"/>
+                    :user-group="1"
+                    @showItem="showCocktailsInfo"/>
       </div>
     </div>
 
@@ -65,10 +72,11 @@ import DialogWindow from "../../components/UI/DialogWindow";
 import AreYouSure from "../../components/UI/AreYouSure";
 import AddPartyForm from "../../components/partiesViewer/AddPartyForm";
 import AddPurchaseForm from "../../components/partiesViewer/AddPurchaseForm";
+import CocktailInfo from "../../components/listsViewer/CocktailInfo";
 
 export default {
   name: "AdminPartyInfo",
-  components: {AddPurchaseForm, ItemsList, DialogWindow, AddPartyForm, AreYouSure},
+  components: {CocktailInfo, AddPurchaseForm, ItemsList, DialogWindow, AddPartyForm, AreYouSure},
   data() {
     return {
       cocktails: this.$store.state.items.cocktails,
@@ -78,6 +86,9 @@ export default {
       party: {
         menu: []
       },
+
+      currentCocktail: undefined,
+      cocktailInfoVisible: false,
 
       currentPurchase: undefined,
       purchaseSureVisible: false,
@@ -90,6 +101,10 @@ export default {
     }
   },
   methods: {
+    showCocktailsInfo(id){
+      this.cocktailInfoVisible = true
+      this.currentCocktail = this.cocktails.find(x => x.id === id)
+    },
     showPurchaseDialog() {
       this.currentPurchase = undefined
       this.purchaseAddIsError = false
