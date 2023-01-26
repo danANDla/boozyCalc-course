@@ -1,23 +1,19 @@
 package com.danandla.boozyBack.service;
 
-import com.danandla.boozyBack.entity.CocktailEntity;
 import com.danandla.boozyBack.entity.MenuEntity;
 import com.danandla.boozyBack.entity.PartyEntity;
-import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.model.PartyModel;
-import com.danandla.boozyBack.model.WeightedIngredientModel;
 import com.danandla.boozyBack.repository.CocktailRepo;
 import com.danandla.boozyBack.repository.MenuRepo;
 import com.danandla.boozyBack.repository.PartyRepo;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PartyService {
@@ -31,9 +27,25 @@ public class PartyService {
     @Autowired
     CocktailRepo cocktailRepo;
 
-    public ArrayList<PartyEntity> getAllParties() {
-        ArrayList<PartyEntity> list = (ArrayList<PartyEntity>) partiesRepo.findAll();
-        return list;
+    public ArrayList<PartyModel> getAllParties() {
+        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAll();
+        ArrayList<PartyModel> retList = new ArrayList<>();
+        for (PartyEntity i : list) {
+            List<MenuEntity> recipe = menuRepo.findByPartId(i.getId());
+            List<Long> cocktails = new ArrayList<>();
+            for (MenuEntity j : recipe)
+                cocktails.add(j.getCocktail_id());
+            PartyModel party = new PartyModel(
+                    i.getId(),
+                    i.getName(),
+                    i.getDate(),
+                    i.getLocation(),
+                    i.getDescription(),
+                    cocktails
+            );
+            retList.add(party);
+        }
+        return retList;
     }
 
     public Long deleteById(Long partyId) throws ItemNameNotFoundException {
@@ -78,7 +90,7 @@ public class PartyService {
         return partiesRepo.save(party);
     }
 
-    public ArrayList<MenuEntity> getMenu(long partyId) throws ItemNameNotFoundException{
+    public ArrayList<MenuEntity> getMenu(long partyId) throws ItemNameNotFoundException {
         PartyEntity t = partiesRepo.findById(partyId).get();
         if (t != null) {
             ArrayList<MenuEntity> list = (ArrayList<MenuEntity>) menuRepo.findByPartId(partyId);
