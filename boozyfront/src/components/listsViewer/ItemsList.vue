@@ -13,6 +13,9 @@
         <div class="item-name">{{ cocktails.find(x => x.id === item).name }}</div>
         <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
       </div>
+      <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item)">
+        <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
+      </div>
       <div v-else class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
           <div class="item-name">{{ item.name }}</div>
@@ -35,7 +38,7 @@
         </div>
       </div>
 
-      <div class="item-navbar" v-if="userGroup===1 && page!=='menu'">
+      <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page!=='users'">
         <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
           <div v-if="page==='purchases'" class="nav-icon" @click="editItem(item.product_id)">
             <font-awesome-icon icon="fa-solid fa-pen"/>
@@ -54,7 +57,7 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1">
+    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -92,6 +95,7 @@ export default {
       ingredients: this.$store.state.items.ingredients,
       cocktails: this.$store.state.items.cocktails,
       products: this.$store.state.items.products,
+      users: this.$store.state.items.users,
       api_url: "http://127.0.0.1:8080/api/",
     }
   },
@@ -176,11 +180,23 @@ export default {
         alert(e.message)
       }
     },
+    async fetchUsers() {
+      try {
+        const response = await axios.get(this.api_url + 'users/all')
+        this.$store.commit("items/updateUsers", response.data)
+        this.users = this.$store.state.items.users
+      } catch (e) {
+        alert(e.message)
+      }
+    },
   },
   mounted() {
     this.fetchCocktails()
     this.fetchIngredients()
     this.fetchProducts()
+    if(this.page === 'users'){
+      this.fetchUsers()
+    }
   },
   beforeUpdate() {
     this.itemRefs = []

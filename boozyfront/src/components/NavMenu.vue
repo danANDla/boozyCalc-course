@@ -6,9 +6,9 @@
           <menu-nav-button :href="href" @click="navigate">Ingredients | Cocktails</menu-nav-button>
         </router-link>
       </div>
-      <div class="item">
-        <menu-nav-button>Stock Manager</menu-nav-button>
-      </div>
+<!--      <div class="item">-->
+<!--        <menu-nav-button>Stock Manager</menu-nav-button>-->
+<!--      </div>-->
       <div class="item">
         <router-link to="/admin/parties" v-slot="{ href, navigate}">
           <menu-nav-button :href="href" @click="navigate">Parties</menu-nav-button>

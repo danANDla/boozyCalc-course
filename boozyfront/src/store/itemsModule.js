@@ -5,7 +5,9 @@ export const itemsModule = {
         products: [],
         cocktailTypes: [],
         parties: [],
-        purchases: []
+        purchases: [],
+        users: [],
+        invites:[]
     }),
     getters: {
         getIngredients(state) {
@@ -25,7 +27,13 @@ export const itemsModule = {
         },
         getPurchases(state){
             return state.purchases
-        }
+        },
+        getUsers(state){
+            return state.users
+        },
+        getInvites(state){
+            return state.invites
+        },
     },
     mutations: {
         updateIngredients(state, newArray) {
@@ -45,7 +53,13 @@ export const itemsModule = {
         },
         updatePurchases(state, newArray){
             state.purchases = newArray
-        }
+        },
+        updateUsers(state, newArray){
+            state.users = newArray
+        },
+        updateInvites(state, newArray){
+            state.invites = newArray
+        },
     },
     actions: {},
     namespaced: true

@@ -10,6 +10,11 @@
 
     <div class="party-items">
       <div>INVITES</div>
+      <div class="list-container">
+        <items-list :items="invites"
+                    :page="'users'"
+                    :user-group="1"/>
+      </div>
     </div>
 
     <dialog-window v-model:show="cocktailInfoVisible">
@@ -82,6 +87,8 @@ export default {
       cocktails: this.$store.state.items.cocktails,
       parties: this.$store.state.items.parties,
       purchases: this.$store.state.items.pusrchases,
+      users: this.$store.state.items.users,
+      invites: undefined,
       api_url: "http://127.0.0.1:8080/api/",
       party: {
         menu: []
@@ -205,6 +212,24 @@ export default {
         alert(e.message)
       }
     },
+    async fetchUsers() {
+      try {
+        const response = await axios.get(this.api_url + 'users/all')
+        this.$store.commit("items/updateUsers", response.data)
+        this.users = this.$store.state.items.users
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async fetchInvites() {
+      try {
+        const response = await axios.get(this.api_url + 'users/invites?party_id=' + this.$route.params.id)
+        this.invites = response.data
+        console.log(this.purchases)
+      } catch (e) {
+        alert(e.message)
+      }
+    },
     async fetchPurchases() {
       try {
         const response = await axios.get(this.api_url + 'purchases/party?id=' + this.$route.params.id)
@@ -234,6 +259,8 @@ export default {
     this.fetchCocktails()
     this.fetchParties()
     this.fetchPurchases()
+    this.fetchUsers()
+    this.fetchInvites()
   }
 }
 </script>
@@ -242,7 +269,6 @@ export default {
 .body-container {
   display: flex;
   flex-direction: column;
-  background-color: white;
 }
 
 .body-container > div {

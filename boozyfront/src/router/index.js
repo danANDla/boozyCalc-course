@@ -37,7 +37,7 @@ const routes = [
                     {
                         path: "parties",
                         name: "parties",
-                        component: AdminPartiesViewer
+                        component: AdminPartiesViewer,
                     },
                     {
                         path: "party/:id",

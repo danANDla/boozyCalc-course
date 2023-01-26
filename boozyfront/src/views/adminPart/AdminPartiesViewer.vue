@@ -179,4 +179,7 @@ export default {
 .form-container {
   width: 350px;
 }
+.section-body{
+  background-color: #576163;
+}
 </style>

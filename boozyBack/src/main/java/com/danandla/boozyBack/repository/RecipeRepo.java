@@ -1,7 +1,6 @@
 package com.danandla.boozyBack.repository;
 
 
-import com.danandla.boozyBack.entity.CocktailEntity;
 import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.entity.RecipeId;
 import org.springframework.data.jpa.repository.Modifying;
