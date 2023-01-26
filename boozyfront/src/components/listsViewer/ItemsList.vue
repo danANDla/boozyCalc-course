@@ -1,11 +1,17 @@
 <template>
   <div class="list-container">
-    <div :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]" v-for="(item,index) in items"
-         :ref="setItemRef">
+    <div
+        :class="[this.isColor[index]===0 ? itemContainer : this.isColor[index]===2 ? whiteItemContainer : redItemContainer]"
+        v-for="(item,index) in items"
+        :ref="setItemRef">
 
       <div v-if="page==='cocktails'" class="cocktail-container" @click="showItem(item.id)">
-        <div class="item-name"> {{ item.name }} </div>
-        <div class="item-recipe"> {{getIngredientsString(item.ingredients)}} </div>
+        <div class="item-name"> {{ item.name }}</div>
+        <div class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
+      </div>
+      <div v-else-if="page==='menu'" class="cocktail-container" @click="showItem(item.id)">
+        <div class="item-name">{{ cocktails.find(x => x.id === item).name }}</div>
+        <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
       </div>
       <div v-else class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
@@ -14,23 +20,35 @@
           <div class="item-info"> {{ item.price }}</div>
         </div>
         <div v-else-if="page==='parties'">
-            <div class="item-name">{{ item.name }}</div>
-            <div class="item-info"> {{ formatDate(item.date) }}</div>
+          <div class="item-name">{{ item.name }}</div>
+          <div class="item-info"> {{ formatDate(item.date) }}</div>
           <div class="item-info"> {{ item.location }}</div>
+        </div>
+        <div v-else-if="page==='purchases'">
+          <div class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
+          <div class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
+          <div class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
+          <div class="item-name"> {{ item.quantity }} </div>
         </div>
         <div v-else>
           <div class="item-name">{{ item.name }}</div>
         </div>
       </div>
 
-      <div class="item-navbar" v-if="userGroup===1">
+      <div class="item-navbar" v-if="userGroup===1 && page!=='menu'">
         <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
-          <div class="nav-icon" @click="editItem(item.id)">
-            <font-awesome-icon icon="fa-solid fa-pen" />
+          <div v-if="page==='purchases'" class="nav-icon" @click="editItem(item.product_id)">
+            <font-awesome-icon icon="fa-solid fa-pen"/>
+          </div>
+          <div v-else class="nav-icon" @click="editItem(item.id)">
+            <font-awesome-icon icon="fa-solid fa-pen"/>
           </div>
         </div>
         <div class="nav-option" @mouseover="this.makeRed(index)" @mouseleave="this.makeNotRed(index)">
-          <div class="nav-icon-trash" @click="deleteItem(item.id, item.name)">
+          <div v-if="page==='purchases'" class="nav-icon" @click="deleteItem(item.product_id, products.find(x => x.id === item.product_id).name)">
+            <font-awesome-icon icon="fas fa-trash"/>
+          </div>
+          <div v-else class="nav-icon-trash" @click="deleteItem(item.id, item.name)">
             <font-awesome-icon icon="fas fa-trash"/>
           </div>
         </div>
@@ -45,6 +63,8 @@
 
 <script>
 import DialogWindow from "@/components/UI/DialogWindow";
+import axios from "axios";
+
 export default {
   name: "ItemsList",
   components: {DialogWindow},
@@ -55,10 +75,6 @@ export default {
     },
     page: {
       type: String,
-      required: false
-    },
-    ingredients: {
-      type: Array,
       required: false
     },
     userGroup: {
@@ -72,7 +88,11 @@ export default {
       isColor: [],
       itemContainer: 'item-container',
       redItemContainer: 'red-item-container',
-      whiteItemContainer: 'tan-item-container'
+      whiteItemContainer: 'tan-item-container',
+      ingredients: this.$store.state.items.ingredients,
+      cocktails: this.$store.state.items.cocktails,
+      products: this.$store.state.items.products,
+      api_url: "http://127.0.0.1:8080/api/",
     }
   },
   methods: {
@@ -91,7 +111,7 @@ export default {
     editItem(id) {
       this.$emit('editItem', id)
     },
-    showItem(id){
+    showItem(id) {
       this.$emit('showItem', id)
     },
     makeRed: function (index) {
@@ -106,9 +126,9 @@ export default {
     makeNotWhite: function (index) {
       this.isColor[index] = 0
     },
-    getIngredientsString(arr){
+    getIngredientsString(arr) {
       let retStr = ""
-      for(var i = 0; i < arr.length - 1; i++){
+      for (var i = 0; i < arr.length - 1; i++) {
         retStr += this.ingredients.find(x => x.id === arr[i].ingredientId).name
         retStr += ", "
       }
@@ -116,17 +136,51 @@ export default {
       console.log(retStr)
       return retStr
     },
-    formatDate(date){
+    formatDate(date) {
       var day = new Date(Date.parse(date)).getDate()
       var month = new Date(Date.parse(date)).getMonth() + 1
-      if (day < 10){
+      if (day < 10) {
         day = '0' + day
       }
-      if (month < 10){
+      if (month < 10) {
         month = '0' + month
       }
       return day + "." + month
-    }
+    },
+    async fetchCocktails() {
+      try {
+        const response = await axios.get(this.api_url + 'cocktails/all')
+        this.$store.commit("items/updateCocktails", response.data)
+        this.cocktails = this.$store.state.items.cocktails
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async fetchIngredients() {
+      try {
+        const response = await axios.get(this.api_url + 'ingredients/all')
+        console.log(response)
+        this.$store.commit("items/updateIngredients", response.data)
+        this.ingredients = this.$store.state.items.ingredients
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async fetchProducts() {
+      try {
+        const response = await axios.get(this.api_url + 'products/all')
+        console.log(response)
+        this.$store.commit("items/updateProducts", response.data)
+        this.products = this.$store.state.items.products
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+  },
+  mounted() {
+    this.fetchCocktails()
+    this.fetchIngredients()
+    this.fetchProducts()
   },
   beforeUpdate() {
     this.itemRefs = []
@@ -154,7 +208,7 @@ export default {
   padding-left: 10px;
 }
 
-.item-container:hover{
+.item-container:hover {
   background-color: white;
   color: black;
 }
@@ -183,6 +237,7 @@ export default {
   align-items: center;
   transition: all 0.2s;
   font-size: 30px;
+  padding: 10px;
 }
 
 .add-item-btn-container:hover {
@@ -206,12 +261,12 @@ export default {
   color: white;
 }
 
-.item-body{
+.item-body {
   width: 100%;
   user-select: none;
 }
 
-.item-body  div{
+.item-body div {
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -221,7 +276,7 @@ export default {
   height: 100%;
 }
 
-.cocktail-container{
+.cocktail-container {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -229,7 +284,7 @@ export default {
   cursor: pointer;
 }
 
-.item-recipe{
+.item-recipe {
   display: flex;
   width: 50%;
   padding: 5px 0px 0px 5px;

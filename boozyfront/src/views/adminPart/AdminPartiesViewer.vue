@@ -90,12 +90,6 @@ export default {
       this.partyAddErrorText = ""
       this.partyDialogVisible = true
     },
-    showSureCocktail(id, name) {
-      this.partySureId = id
-      this.partySureName = name
-      this.partySureVisible = true
-      console.log('trying delete ' + id)
-    },
     showPartyInfo(id){
       this.partyInfoVisible = true
       console.log('showPartyInfo', id)

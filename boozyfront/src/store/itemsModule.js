@@ -4,7 +4,8 @@ export const itemsModule = {
         cocktails: [],
         products: [],
         cocktailTypes: [],
-        parties: []
+        parties: [],
+        purchases: []
     }),
     getters: {
         getIngredients(state) {
@@ -21,6 +22,9 @@ export const itemsModule = {
         },
         getParties(state){
             return state.parties
+        },
+        getPurchases(state){
+            return state.purchases
         }
     },
     mutations: {
@@ -38,6 +42,9 @@ export const itemsModule = {
         },
         updateParties(state, newParty){
             state.parties = newParty
+        },
+        updatePurchases(state, newArray){
+            state.purchases = newArray
         }
     },
     actions: {},
