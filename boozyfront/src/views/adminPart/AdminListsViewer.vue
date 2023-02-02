@@ -72,14 +72,6 @@
       />
     </div>
     <div v-if="page==='ingredients'">
-      <div class="add-item-btn-container" @click="showIngredientsDialog">
-        <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
-      </div>
-<!--      <typed-item-section v-bind:items="ingredients" type-name="" :user-group="1"-->
-<!--                          @addItem="showIngredientsDialog"-->
-<!--                          @deleteItem="showSureIngredient"-->
-<!--                          @editItem="showIngredientsEditDialog"></typed-item-section>-->
-
       <typed-item-section v-for="(item,index) in distinctIngredientTypes"
                           v-bind:items="this.ingredients.filter(x => x.type === item)"
                           :type-name="getTypeName(item)"
@@ -88,6 +80,10 @@
                           @addItem="showIngredientsDialog"
                           @deleteItem="showSureIngredient"
                           @editItem="showIngredientsEditDialog"></typed-item-section>
+
+      <div class="add-item-btn-container" @click="showIngredientsDialog">
+        <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
+      </div>
     </div>
     <div v-else-if="page==='cocktails'">
       <typed-item-section v-bind:items="cocktails" type-name="" :user-group="1"
