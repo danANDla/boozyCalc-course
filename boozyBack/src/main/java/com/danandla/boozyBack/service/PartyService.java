@@ -3,6 +3,7 @@ package com.danandla.boozyBack.service;
 import com.danandla.boozyBack.entity.InviteEntity;
 import com.danandla.boozyBack.entity.MenuEntity;
 import com.danandla.boozyBack.entity.PartyEntity;
+import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
@@ -11,6 +12,7 @@ import com.danandla.boozyBack.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class PartyService {
     InviteRepo inviteRepo;
 
     public ArrayList<PartyModel> getAllParties() {
-        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAll();
+        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
         ArrayList<PartyModel> retList = new ArrayList<>();
         for (PartyEntity i : list) {
             List<MenuEntity> recipe = menuRepo.findByPartId(i.getId());
@@ -92,6 +94,14 @@ public class PartyService {
         party.setName(newParty.getName());
         party.setLocation(newParty.getLocation());
         party.setDate(newParty.getDate());
+
+        ArrayList<MenuEntity> menu = (ArrayList<MenuEntity>) menuRepo.findByPartId(newParty.getId());
+        menuRepo.deleteAll(menu);
+
+        for (Long i : newParty.getMenu()) {
+            MenuEntity cocktail = new MenuEntity(newParty.getId(), i);
+            menuRepo.save(cocktail);
+        }
         return partiesRepo.save(party);
     }
 
