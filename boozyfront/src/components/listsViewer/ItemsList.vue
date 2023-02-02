@@ -13,7 +13,7 @@
         <div class="item-name">{{ cocktails.find(x => x.id === item).name }}</div>
         <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
       </div>
-      <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item)">
+      <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item.person_id)">
         <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
       </div>
       <div v-else class="item-body" @click="showItem(item.id)">
@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users'">
+    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -143,13 +143,18 @@ export default {
     formatDate(date) {
       var day = new Date(Date.parse(date)).getDate()
       var month = new Date(Date.parse(date)).getMonth() + 1
+      var year = new Date(Date.parse(date)).getFullYear()
       if (day < 10) {
         day = '0' + day
       }
+
+      var monthStr = ["янв", "февр", "мар", "апр", "май", "июнь", "июль", "авг", "сент", "окт", "нояб", "дек"]
+
       if (month < 10) {
         month = '0' + month
       }
-      return day + "." + month
+
+      return day + " " + monthStr[month-1] + " " + year
     },
     async fetchCocktails() {
       try {

@@ -7,7 +7,8 @@ export const itemsModule = {
         parties: [],
         purchases: [],
         users: [],
-        invites:[]
+        invites:[],
+        ingredientTypes: []
     }),
     getters: {
         getIngredients(state) {
@@ -60,6 +61,9 @@ export const itemsModule = {
         updateInvites(state, newArray){
             state.invites = newArray
         },
+        updateIngredientTypes(state, newArray){
+            state.ingredientTypes = newArray
+        }
     },
     actions: {},
     namespaced: true

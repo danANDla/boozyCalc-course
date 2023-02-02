@@ -14,8 +14,8 @@
       <nav-menu :user-group="0"></nav-menu>
     </nav>
 
-    <aside>Sidebar</aside>
-    <footer>Footer</footer>
+    <aside></aside>
+    <footer></footer>
   </div>
 </template>
 
@@ -71,7 +71,6 @@ main {
 
 footer {
   grid-area: footer;
-  background-color: black;
 }
 
 aside {

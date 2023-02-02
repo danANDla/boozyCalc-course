@@ -18,6 +18,13 @@
             placeholder="description"
         />
       </div>
+      <div>
+        <drop-down v-bind:value="this.ingredient.type"
+                   v-on:change="this.ingredient.type = parseInt($event.target.value)"
+                   :itemList="types">
+          choose type of ingredient
+        </drop-down>
+      </div>
       <div class="btn-container" v-if="!isEdit">
         <rect-button btn-type="purple" @click="submitData"> add </rect-button>
       </div>
@@ -52,9 +59,11 @@ export default {
       ingredient:{
         name: '',
         description: '',
-        id: undefined
+        id: undefined,
+        type: undefined
       },
-      isEdit: false
+      isEdit: false,
+      types: this.$store.state.items.ingredientTypes
     }
   },
   methods:{
@@ -70,6 +79,7 @@ export default {
       this.ingredient.name = this.prevIngredient.name;
       this.ingredient.description = this.prevIngredient.description;
       this.ingredient.id = this.prevIngredient.id;
+      this.ingredient.type = this.prevIngredient.type;
       this.isEdit = true;
     }
   }

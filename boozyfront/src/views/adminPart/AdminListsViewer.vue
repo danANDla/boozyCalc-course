@@ -72,7 +72,19 @@
       />
     </div>
     <div v-if="page==='ingredients'">
-      <typed-item-section v-bind:items="ingredients" type-name="" :user-group="1"
+      <div class="add-item-btn-container" @click="showIngredientsDialog">
+        <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
+      </div>
+<!--      <typed-item-section v-bind:items="ingredients" type-name="" :user-group="1"-->
+<!--                          @addItem="showIngredientsDialog"-->
+<!--                          @deleteItem="showSureIngredient"-->
+<!--                          @editItem="showIngredientsEditDialog"></typed-item-section>-->
+
+      <typed-item-section v-for="(item,index) in distinctIngredientTypes"
+                          v-bind:items="this.ingredients.filter(x => x.type === item)"
+                          :type-name="getTypeName(item)"
+                          :user-group="1"
+                          v-bind:page="'ingredients'"
                           @addItem="showIngredientsDialog"
                           @deleteItem="showSureIngredient"
                           @editItem="showIngredientsEditDialog"></typed-item-section>
@@ -146,6 +158,8 @@ export default {
       ingrSureId: Number,
       ingredientsAddIsError: false,
       ingredientsAddErrorText: "",
+      ingredientTypes: this.$store.state.items.ingredientTypes,
+      distinctIngredientTypes: [],
 
       cocksSureVisible: false,
       cocksDialogVisible: false,
@@ -451,10 +465,33 @@ export default {
       const response = await axios.delete(this.api_url + 'products?id=' + id)
       console.log(response)
       await this.fetchProducts()
-    }
+    },
+    async fetchIngredientTypes() {
+      try {
+        const response = await axios.get(this.api_url + 'ingredients/allTypes')
+        console.log(response)
+        this.$store.commit("items/updateIngredientTypes", response.data)
+        this.ingredientTypes = this.$store.state.items.ingredientTypes
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    async getAllTypes() {
+      try {
+        const response = await axios.get(this.api_url + 'ingredients/distinctTypes')
+        this.distinctIngredientTypes = response.data;
+      } catch (e) {
+        alert(e.message)
+      }
+    },
+    getTypeName(id){
+      return this.ingredientTypes.find(x => x.id === id).name
+    },
   },
   mounted() {
     console.log("Fetching")
+    this.fetchIngredientTypes()
+    this.getAllTypes()
     this.fetchIngredients()
     this.fetchCocktails()
     this.fetchProducts()
@@ -478,5 +515,19 @@ export default {
 
 .list-container div {
   width: 100%;
+}
+
+.add-item-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+  font-size: 30px;
+  padding: 10px;
+}
+
+.add-item-btn-container:hover {
+  background-color: #CFE5EE;
+  color: skyblue;
 }
 </style>

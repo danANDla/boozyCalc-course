@@ -8,12 +8,19 @@
       <div> event time: {{ formatDate(this.party.date) }}</div>
     </div>
 
+    <dialog-window v-model:show="userInfoVisible">
+<!--      <div class="info-container">-->
+<!--        <user-info :user="this.currentUser"></user-info>-->
+<!--      </div>-->
+    </dialog-window>
+
     <div class="party-items">
       <div>INVITES</div>
       <div class="list-container">
         <items-list :items="invites"
                     :page="'users'"
-                    :user-group="1"/>
+                    :user-group="1"
+                    @showItem="showUser"/>
       </div>
     </div>
 
@@ -94,6 +101,9 @@ export default {
         menu: []
       },
 
+      currentUser: undefined,
+      userInfoVisible: false,
+
       currentCocktail: undefined,
       cocktailInfoVisible: false,
 
@@ -108,9 +118,13 @@ export default {
     }
   },
   methods: {
+    showUser(id){
+      this.userInfoVisible = true
+      this.currentUser = this.invites.find(x => x.person_id === id)
+    },
     showCocktailsInfo(id){
-      this.cocktailInfoVisible = true
       this.currentCocktail = this.cocktails.find(x => x.id === id)
+      this.cocktailInfoVisible = true
     },
     showPurchaseDialog() {
       this.currentPurchase = undefined
