@@ -27,6 +27,26 @@ public class IngredientController {
         }
     }
 
+    @GetMapping("/allTypes")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getTypes() {
+        try {
+            return ResponseEntity.ok(ingredientService.getAllTypes());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @GetMapping("/distinctTypes")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getDistinctTypes() {
+        try {
+            return ResponseEntity.ok(ingredientService.getAllDistinctTypes());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
     @DeleteMapping
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity deleteIngredientById(@RequestParam Long id) {

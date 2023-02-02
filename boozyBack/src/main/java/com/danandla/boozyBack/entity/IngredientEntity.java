@@ -10,6 +10,7 @@ public class IngredientEntity {
     private Long id;
     private String name;
     private String description;
+    private Long type;
 
     public IngredientEntity(){
 
@@ -37,5 +38,13 @@ public class IngredientEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getType() {
+        return type;
+    }
+
+    public void setType(Long type) {
+        this.type = type;
     }
 }
