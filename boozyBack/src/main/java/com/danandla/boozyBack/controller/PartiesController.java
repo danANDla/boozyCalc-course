@@ -76,4 +76,16 @@ public class PartiesController {
             return ResponseEntity.badRequest().body(e);
         }
     }
+
+    @GetMapping("/available")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getAvailable(@RequestParam Long id) {
+        try {
+            return ResponseEntity.ok(partyService.getAvailableCocktails(id));
+        } catch (ItemIdNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

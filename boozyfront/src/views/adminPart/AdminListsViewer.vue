@@ -103,7 +103,7 @@
                           v-bind:page="'products'"
                           v-bind:ingredients="ingredients"></typed-item-section>
 
-      <div class="add-item-btn-container" @click="showIngredientsDialog">
+      <div class="add-item-btn-container" @click="showProductsDialog">
         <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
       </div>
     </div>

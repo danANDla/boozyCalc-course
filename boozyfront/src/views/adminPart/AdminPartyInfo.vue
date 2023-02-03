@@ -35,6 +35,7 @@
       <div class="list-container">
         <items-list :items="party.menu"
                     :page="'menu'"
+                    :party_id="this.$route.params.id"
                     :user-group="1"
                     @showItem="showCocktailsInfo"/>
       </div>
@@ -239,7 +240,6 @@ export default {
       try {
         const response = await axios.get(this.api_url + 'users/invites?party_id=' + this.$route.params.id)
         this.invites = response.data
-        console.log(this.purchases)
       } catch (e) {
         alert(e.message)
       }
@@ -251,7 +251,6 @@ export default {
         // this.$store.commit("items/updatePurchases", response.data)
         // this.purchases = this.$store.state.items.purchases
         this.purchases = response.data
-        console.log(this.purchases)
       } catch (e) {
         alert(e.message)
       }

@@ -9,9 +9,18 @@
         <div class="item-name"> {{ item.name }}</div>
         <div class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
       </div>
-      <div v-else-if="page==='menu'" class="cocktail-container" @click="showItem(item)">
-        <div class="item-name">{{ cocktails.find(x => x.id === item).name }}</div>
-        <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
+      <div v-else-if="page==='menu'" class="menu-container" @click="showItem(item)">
+        <div class="cocktail-container">
+          <div class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
+          <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
+        </div>
+        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity">
+          <div>
+            {{this.availableCocktails.find(x => x.cocktail_id === item).quantity}}
+          </div>
+        </div>
+        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity-green"/>
+        <div v-else class="quantity-red"/>
       </div>
       <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item.person_id)">
         <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
@@ -80,6 +89,10 @@ export default {
       type: String,
       required: false
     },
+    party_id: {
+      type: Number,
+      required: false
+    },
     userGroup: {
       type: Number,
       required: true
@@ -94,6 +107,7 @@ export default {
       whiteItemContainer: 'tan-item-container',
       ingredients: this.$store.state.items.ingredients,
       cocktails: this.$store.state.items.cocktails,
+      availableCocktails: undefined,
       products: this.$store.state.items.products,
       users: this.$store.state.items.users,
       api_url: "http://127.0.0.1:8080/api/",
@@ -137,7 +151,6 @@ export default {
         retStr += ", "
       }
       retStr += this.ingredients.find(x => x.id === arr[arr.length - 1].ingredientId).name
-      console.log(retStr)
       return retStr
     },
     formatDate(date) {
@@ -192,14 +205,28 @@ export default {
         alert(e.message)
       }
     },
+    async getAvailableCocktails(){
+      try {
+        const response = await axios.get(this.api_url + 'parties/available?id=' + this.party_id)
+        this.availableCocktails = response.data
+        console.log(this.availableCocktails)
+      } catch (e) {
+        alert(e.message)
+      }
+    }
   },
-  mounted() {
+  beforeMount() {
     this.fetchCocktails()
     this.fetchIngredients()
     this.fetchProducts()
     if(this.page === 'users'){
       this.fetchUsers()
     }
+    if(this.page === 'menu'){
+      this.getAvailableCocktails()
+    }
+  },
+  mounted() {
   },
   beforeUpdate() {
     this.itemRefs = []
@@ -299,8 +326,35 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 10px 10px 10px 10px;
   cursor: pointer;
+}
+
+.menu-container{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 10px;
+  cursor: pointer;
+  align-items: center;
+}
+
+.quantity{
+  height: 100%;
+  padding-right: 10px;
+  align-items: center;
+  display: flex;
+}
+
+.quantity-green{
+  background-color: limegreen;
+  height: 100%;
+  width: 10px;
+}
+
+.quantity-red{
+  background-color: darkred;
+  height: 100%;
+  width: 10px;
 }
 
 .item-recipe {

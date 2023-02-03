@@ -1,9 +1,9 @@
 package com.danandla.boozyBack.service;
 
+import com.danandla.boozyBack.entity.AvailableCocktailsEntity;
 import com.danandla.boozyBack.entity.InviteEntity;
 import com.danandla.boozyBack.entity.MenuEntity;
 import com.danandla.boozyBack.entity.PartyEntity;
-import com.danandla.boozyBack.entity.RecipeEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
@@ -12,7 +12,6 @@ import com.danandla.boozyBack.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +32,9 @@ public class PartyService {
 
     @Autowired
     InviteRepo inviteRepo;
+
+    @Autowired
+    AvailableCocktailRepo availableCocktailRepo;
 
     public ArrayList<PartyModel> getAllParties() {
         List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
@@ -119,5 +121,13 @@ public class PartyService {
             ArrayList<InviteEntity> list = (ArrayList<InviteEntity>) inviteRepo.findByPartId(partyId);
             return list;
         } else throw new ItemNameNotFoundException("party with this id wasn't found");
+    }
+
+    public ArrayList<AvailableCocktailsEntity> getAvailableCocktails(long partyId) throws ItemIdNotFoundException {
+        PartyEntity t = partiesRepo.findById(partyId).get();
+        if (t != null) {
+            ArrayList<AvailableCocktailsEntity> list = (ArrayList<AvailableCocktailsEntity>) availableCocktailRepo.getByParty(partyId);
+            return list;
+        } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
 }
