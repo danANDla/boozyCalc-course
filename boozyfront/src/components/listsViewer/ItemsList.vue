@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients'">
+    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients' && page !=='products'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -168,7 +168,6 @@ export default {
     async fetchIngredients() {
       try {
         const response = await axios.get(this.api_url + 'ingredients/all')
-        console.log(response)
         this.$store.commit("items/updateIngredients", response.data)
         this.ingredients = this.$store.state.items.ingredients
       } catch (e) {
@@ -178,7 +177,6 @@ export default {
     async fetchProducts() {
       try {
         const response = await axios.get(this.api_url + 'products/all')
-        console.log(response)
         this.$store.commit("items/updateProducts", response.data)
         this.products = this.$store.state.items.products
       } catch (e) {

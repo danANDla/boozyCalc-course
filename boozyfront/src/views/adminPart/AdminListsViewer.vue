@@ -93,12 +93,19 @@
                           @showItem="showCocktailsInfo"></typed-item-section>
     </div>
     <div v-else>
-      <typed-item-section v-bind:items="products" type-name="" :user-group="1"
+      <typed-item-section v-for="(item,index) in distinctIngredientTypes"
+                          v-bind:items="products.filter(x => (this.ingredients.filter(y => y.id === x.ingredientId)[0]).type == item)"
+                          :type-name="getTypeName(item)"
+                          :user-group="1"
                           @addItem="showProductsDialog"
                           @deleteItem="showSureProduct"
                           @editItem="showProductsEditDialog"
-                          v-bind:ingredients="ingredients"
-                          v-bind:page="'products'"></typed-item-section>
+                          v-bind:page="'products'"
+                          v-bind:ingredients="ingredients"></typed-item-section>
+
+      <div class="add-item-btn-container" @click="showIngredientsDialog">
+        <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
+      </div>
     </div>
   </div>
 </template>
@@ -177,7 +184,6 @@ export default {
     async fetchIngredients() {
       try {
         const response = await axios.get(this.api_url + 'ingredients/all')
-        console.log(response)
         this.$store.commit("items/updateIngredients", response.data)
         this.ingredients = this.$store.state.items.ingredients
       } catch (e) {
@@ -187,7 +193,6 @@ export default {
     async fetchCocktails() {
       try {
         const response = await axios.get(this.api_url + 'cocktails/all')
-        console.log(response)
         this.$store.commit("items/updateCocktails", response.data)
         this.cocktails = this.$store.state.items.cocktails
       } catch (e) {
@@ -197,7 +202,6 @@ export default {
     async fetchProducts() {
       try {
         const response = await axios.get(this.api_url + 'products/all')
-        console.log(response)
         this.$store.commit("items/updateProducts", response.data)
         this.products = this.$store.state.items.products
       } catch (e) {
@@ -207,7 +211,6 @@ export default {
     async fetchCocktailTypes() {
       try {
         const response = await axios.get(this.api_url + 'cocktails/allTypes')
-        console.log(response)
         this.$store.commit("items/updateCocktailTypes", response.data)
         this.cocktailTypes = this.$store.state.items.cocktailTypes
       } catch (e) {
@@ -465,7 +468,6 @@ export default {
     async fetchIngredientTypes() {
       try {
         const response = await axios.get(this.api_url + 'ingredients/allTypes')
-        console.log(response)
         this.$store.commit("items/updateIngredientTypes", response.data)
         this.ingredientTypes = this.$store.state.items.ingredientTypes
       } catch (e) {
@@ -483,6 +485,18 @@ export default {
     getTypeName(id){
       return this.ingredientTypes.find(x => x.id === id).name
     },
+    test(){
+      console.log('test')
+      var arr = this.ingredients.filter(y => y.id === 2)
+      let item = 0
+      arr = this.ingredients.filter(y => y.id === 1)[0]
+      console.log(typeof arr, arr.type)
+      for(item in this.distinctIngredientTypes){
+        arr = this.products.filter(x => (this.ingredients.filter(y => y.id === x.ingredientId)[0]).type == item)
+        arr = (this.ingredients.filter(y => y.id === 1)).type
+        console.log(arr)
+      }
+    }
   },
   mounted() {
     console.log("Fetching")
