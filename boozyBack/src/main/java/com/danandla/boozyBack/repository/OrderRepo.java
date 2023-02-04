@@ -14,4 +14,7 @@ public interface OrderRepo extends CrudRepository<OrderEntity, Long> {
 
     @Query(value = "SELECT name as name, COUNT(*) as count, sum(price) as price FROM orders WHERE person_id = ?2 AND party_id = ?1 GROUP BY name", nativeQuery = true)
     List<GroupedOrderEntity> findGroupedOrder(Long party_id, Long person_id);
+
+    @Query(value = "CALL add_item_to_order(?1, ?2, ?3, 1)", nativeQuery = true)
+    Long addOrder(Long party_id, Long cocktail_id, Long person_id);
 }

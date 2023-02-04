@@ -4,13 +4,17 @@ import com.danandla.boozyBack.entity.*;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
+import com.danandla.boozyBack.exception.ItemNotAddedException;
+import com.danandla.boozyBack.model.OrderModel;
 import com.danandla.boozyBack.model.PartyModel;
 import com.danandla.boozyBack.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PartyService {
@@ -35,6 +39,9 @@ public class PartyService {
 
     @Autowired
     OrderRepo orderRepo;
+
+    @Autowired
+    OrderJpaRepo orderRepoAdd;
 
     public ArrayList<PartyModel> getAllParties() {
         List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
@@ -145,5 +152,36 @@ public class PartyService {
             ArrayList<GroupedOrderEntity> list = (ArrayList<GroupedOrderEntity>) orderRepo.findGroupedOrder(partyId, personId);
             return list;
         } else throw new ItemIdNotFoundException("party with this id wasn't found");
+    }
+
+    public static Throwable findCauseUsingPlainJava(Throwable throwable) {
+        Objects.requireNonNull(throwable);
+        Throwable rootCause = throwable;
+        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+            rootCause = rootCause.getCause();
+        }
+        return rootCause;
+    }
+
+    public OrderEntity addOrder(OrderModel newOrder) throws ItemIdNotFoundException, ItemNotAddedException {
+
+        if (cocktailRepo.findById(newOrder.getCocktail_id()).isEmpty())
+            throw new ItemIdNotFoundException("cocktail with this id was not found");
+        if (partiesRepo.findById(newOrder.getParty_id()).isEmpty())
+            throw new ItemIdNotFoundException("party with this id was not found");
+
+//        Long orderId = orderRepoAdd.addOrder(newOrder.getParty_id(), newOrder.getCocktail_id(), newOrder.getPerson_id(), 1L);
+        Long orderId = -1L;
+        try {
+            orderId = orderRepo.addOrder(newOrder.getParty_id(), newOrder.getCocktail_id(), newOrder.getPerson_id());
+        } catch (DataAccessException e) {
+            System.out.println("VBBBBBBBBBBB");
+            Throwable root = findCauseUsingPlainJava(e);
+            System.out.println(root.getMessage());
+            System.out.println("AAAAAAAAAA");
+            throw new ItemNotAddedException(root.getMessage().split("\n", 2)[0]);
+        }
+        if (orderRepo.findById(orderId).isPresent()) return orderRepo.findById(orderId).get();
+        else throw new ItemIdNotFoundException("order wasn't added");
     }
 }

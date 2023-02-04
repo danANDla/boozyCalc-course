@@ -4,6 +4,8 @@ import com.danandla.boozyBack.entity.PartyEntity;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
+import com.danandla.boozyBack.exception.ItemNotAddedException;
+import com.danandla.boozyBack.model.OrderModel;
 import com.danandla.boozyBack.model.PartyModel;
 import com.danandla.boozyBack.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +109,19 @@ public class PartiesController {
         try {
             return ResponseEntity.ok(partyService.getGroupedOrders(id, person));
         } catch (ItemIdNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PostMapping("/order")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity addOrder(@RequestBody OrderModel newOrder) {
+        try {
+            partyService.addOrder(newOrder);
+            return ResponseEntity.ok("order successfully added");
+        } catch (ItemIdNotFoundException | ItemNotAddedException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
