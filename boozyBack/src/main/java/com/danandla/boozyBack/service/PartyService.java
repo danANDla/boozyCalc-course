@@ -1,9 +1,6 @@
 package com.danandla.boozyBack.service;
 
-import com.danandla.boozyBack.entity.AvailableCocktailsEntity;
-import com.danandla.boozyBack.entity.InviteEntity;
-import com.danandla.boozyBack.entity.MenuEntity;
-import com.danandla.boozyBack.entity.PartyEntity;
+import com.danandla.boozyBack.entity.*;
 import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
@@ -35,6 +32,9 @@ public class PartyService {
 
     @Autowired
     AvailableCocktailRepo availableCocktailRepo;
+
+    @Autowired
+    OrderRepo orderRepo;
 
     public ArrayList<PartyModel> getAllParties() {
         List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
@@ -127,6 +127,22 @@ public class PartyService {
         PartyEntity t = partiesRepo.findById(partyId).get();
         if (t != null) {
             ArrayList<AvailableCocktailsEntity> list = (ArrayList<AvailableCocktailsEntity>) availableCocktailRepo.getByParty(partyId);
+            return list;
+        } else throw new ItemIdNotFoundException("party with this id wasn't found");
+    }
+
+    public ArrayList<OrderEntity> getOrders(long partyId) throws ItemIdNotFoundException {
+        PartyEntity t = partiesRepo.findById(partyId).get();
+        if (t != null) {
+            ArrayList<OrderEntity> list = (ArrayList<OrderEntity>) orderRepo.findByParty(partyId);
+            return list;
+        } else throw new ItemIdNotFoundException("party with this id wasn't found");
+    }
+
+    public ArrayList<GroupedOrderEntity> getGroupedOrders(long partyId, long personId) throws ItemIdNotFoundException {
+        PartyEntity t = partiesRepo.findById(partyId).get();
+        if (t != null) {
+            ArrayList<GroupedOrderEntity> list = (ArrayList<GroupedOrderEntity>) orderRepo.findGroupedOrder(partyId, personId);
             return list;
         } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
