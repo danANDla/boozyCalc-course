@@ -127,4 +127,16 @@ public class PartiesController {
             return ResponseEntity.badRequest().body(e);
         }
     }
+
+    @GetMapping("/needed")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getAvailable(@RequestParam Long p_id, @RequestParam Long c_id) {
+        try {
+            return ResponseEntity.ok(partyService.getNeededIngredients(p_id, c_id));
+        } catch (ItemIdNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }

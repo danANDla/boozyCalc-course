@@ -39,6 +39,9 @@ public class PartyService {
     AvailableCocktailRepo availableCocktailRepo;
 
     @Autowired
+    NeededIngredientsRepo neededIngredientsRepo;
+
+    @Autowired
     OrderRepo orderRepo;
 
     @Autowired
@@ -139,6 +142,14 @@ public class PartyService {
         } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
 
+    public ArrayList<NeededIngredientsEntity> getNeededIngredients(long p_id, long c_id) throws ItemIdNotFoundException {
+        PartyEntity t = partiesRepo.findById(p_id).get();
+        if (t != null) {
+            ArrayList<NeededIngredientsEntity> list = (ArrayList<NeededIngredientsEntity>) neededIngredientsRepo.getNeeded(p_id, c_id);
+            return list;
+        } else throw new ItemIdNotFoundException("party with this id wasn't found");
+    }
+
     public ArrayList<OrderEntity> getOrders(long partyId) throws ItemIdNotFoundException {
         PartyEntity t = partiesRepo.findById(partyId).get();
         if (t != null) {
@@ -157,7 +168,6 @@ public class PartyService {
                 float price = 0;
                 for(GroupedOrderItemEntity item: items) price += item.getPrice();
                 GroupedOrderModel groupedOrder = new GroupedOrderModel(i.getPerson_id(), items, price);
-                System.out.println(groupedOrder);
                 list.add(groupedOrder);
             }
             return list;
