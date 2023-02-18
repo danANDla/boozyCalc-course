@@ -5,12 +5,12 @@
         v-for="(item,index) in items"
         :ref="setItemRef">
 
-      <div v-if="page==='cocktails'" class="cocktail-container" @click="showItem(item.id)">
+      <div class="cocktail-container" v-if="page==='cocktails'" @click="showItem(item.id)">
         <div class="item-name"> {{ item.name }}</div>
         <div v-show="!ingredientsLoading" class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
       </div>
 
-      <div v-else-if="page==='menu'" class="menu-container" @click="showItem(item)">
+      <div class="menu-container" v-else-if="page==='menu'" @click="showItem(item)">
           <div class="cocktail-container">
             <div v-if="!cocktailsLoading" class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
             <div v-if="!ingredientsLoading" class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
@@ -25,30 +25,31 @@
           <div v-else class="quantity-red"/>
       </div>
 
-      <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item.person_id)">
+      <div class="cocktail-container" v-else-if="page==='users'" @click="showItem(item.person_id)">
         <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
       </div>
 
-      <div v-else class="item-body" @click="showItem(item.id)">
-        <div v-if="page==='products' && this.ingredients !== undefined">
-          <div class="item-name">{{ item.name }}</div>
-          <div class="item-info"> {{ item.ingredientName }}</div>
-          <div class="item-info"> {{ item.price }}</div>
-        </div>
-        <div v-else-if="page==='parties'">
-          <div class="item-name">{{ item.name }}</div>
-          <div class="item-info"> {{ formatDate(item.date) }}</div>
-          <div class="item-info"> {{ item.location }}</div>
-        </div>
-        <div v-else-if="page==='purchases'">
-          <div v-if="!productsLoading" class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
-          <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
-          <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
-          <div class="item-name"> {{ item.quantity }}</div>
-        </div>
-        <div v-else>
-          <div class="item-name">{{ item.name }}</div>
-        </div>
+      <div class = "products-container" v-else-if="page==='products' && this.ingredients !== undefined" @click="showItem(item.id)">
+        <div class="item-name">{{ item.name }}</div>
+        <div class="item-info"> {{ item.ingredientName }}</div>
+        <div class="item-info"> {{ item.price }}</div>
+      </div>
+
+      <div class="parties-container" v-else-if="page==='parties'" @click="showItem(item.id)">
+        <div class="item-name">{{ item.name }}</div>
+        <div class="item-info"> {{ formatDate(item.date) }}</div>
+        <div class="item-info"> {{ item.location }}</div>
+      </div>
+
+      <div class="purchases-container" v-else-if="page==='purchases'" @click="showItem(item.id)">
+        <div v-if="!productsLoading" class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
+        <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
+        <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
+        <div class="item-name"> {{ item.quantity }}</div>
+      </div>
+
+      <div v-else>
+        <div class="item-name">{{ item.name }}</div>
       </div>
 
       <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page!=='users'">
@@ -333,18 +334,18 @@ export default {
   color: white;
 }
 
-.item-body {
+.products-container, .parties-container, .purchases-container {
   width: 100%;
-  user-select: none;
-}
-
-.item-body div {
-  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: row;
   overflow-x: hidden;
   overflow-y: scroll;
   align-items: center;
+  user-select: none;
+}
+.products-container div, .parties-container div, .purchases-container div{
+  width: 100%;
   height: 100%;
 }
 
