@@ -21,7 +21,7 @@
       </div>
       <div v-else class="list-container">
         <items-list :items="invites"
-                    :page="'users'"
+                    :page="'invites'"
                     :user-group="1"
                     :party_id="this.$route.params.id"
                     @showItem="showUser"/>

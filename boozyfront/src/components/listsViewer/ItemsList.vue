@@ -25,8 +25,9 @@
           <div v-else class="quantity-red"/>
       </div>
 
-      <div class="cocktail-container" v-else-if="page==='users'" @click="showItem(item.person_id)">
+      <div class="invites-container" v-else-if="page==='invites'" @click="showItem(item.person_id)">
         <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
+        <div class="item-info" v-if="!groupedOrdersLoading"> {{ getGroupedOrderString(item.person_id) }} </div>
       </div>
 
       <div class = "products-container" v-else-if="page==='products' && this.ingredients !== undefined" @click="showItem(item.id)">
@@ -48,11 +49,11 @@
         <div class="item-name"> {{ item.quantity }}</div>
       </div>
 
-      <div v-else>
+      <div class="products-container" v-else @click="showItem(item.id)">
         <div class="item-name">{{ item.name }}</div>
       </div>
 
-      <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page!=='users'">
+      <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page!=='invites'">
         <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
           <div v-if="page==='purchases'" class="nav-icon" @click="editItem(item.product_id)">
             <font-awesome-icon icon="fa-solid fa-pen"/>
@@ -73,7 +74,7 @@
       </div>
     </div>
     <div class="add-item-btn-container" @click="addItem"
-         v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients' && page !=='products'">
+         v-if="userGroup===1 && page!=='invites' && page!=='menu' && page !=='ingredients' && page !=='products'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -117,14 +118,15 @@ export default {
       availableCocktails: undefined,
       products: this.$store.state.items.products,
       users: this.$store.state.items.users,
-      groupedOrder: undefined,
+      groupedOrders: undefined,
       api_url: "http://127.0.0.1:8080/api/",
 
       cocktailsLoading: true,
       usersLoading: true,
       availableCocktailsLoading: true,
       productsLoading: true,
-      ingredientsLoading: true
+      ingredientsLoading: true,
+      groupedOrdersLoading: true
     }
   },
   methods: {
@@ -242,14 +244,48 @@ export default {
             console.log(error)
           })
           .finally(() => this.availableCocktailsLoading = false)
+    },
+    getGroupedOrders() {
+      axios
+          .get(this.api_url + 'parties/grouped?id=' + this.party_id)
+          .then(response => {
+            this.groupedOrders = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.groupedOrdersLoading = false)
+    },
+    getGroupedOrderString(person_id){
+      let groupedOrder = this.groupedOrders.find(x => x.person_id === person_id)
+      if(groupedOrder.items.length === 0) return ""
+      let retStr = ""
+      let orderItem = {
+        name: undefined,
+        count: undefined,
+        price: undefined
+      }
+      for (var i = 0; i < (groupedOrder.items).length - 1; i++) {
+        orderItem = groupedOrder.items[i]
+        retStr += orderItem.name
+        retStr += " x "
+        retStr += orderItem.count
+        retStr += ", "
+      }
+      orderItem = groupedOrder.items[groupedOrder.items.length - 1]
+      retStr += orderItem.name
+      retStr += " x "
+      retStr += orderItem.count
+      return retStr
     }
   },
   mounted() {
     this.fetchCocktails()
     this.fetchIngredients()
     this.fetchProducts()
-    if (this.page === 'users') {
+    if (this.page === 'invites') {
       this.fetchUsers()
+      this.getGroupedOrders()
     }
     if (this.page === 'menu') {
       this.getAvailableCocktails()
@@ -347,6 +383,7 @@ export default {
 .products-container div, .parties-container div, .purchases-container div{
   width: 100%;
   height: 100%;
+  margin: 10px;
 }
 
 .cocktail-container {
@@ -394,5 +431,18 @@ export default {
 .item-name {
   font-size: x-large;
   font-weight: normal;
+}
+
+.invites-container{
+  display: flex;
+  width: 100%;
+  user-select: none;
+  margin: 10px;
+}
+.invites-container .item-name{
+  flex-grow: 1;
+}
+.invites-container .item-info{
+  flex-grow: 1;
 }
 </style>
