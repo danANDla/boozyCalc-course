@@ -16,10 +16,14 @@
 
     <div class="party-items">
       <div>INVITES</div>
-      <div class="list-container">
+      <div v-if="invitesLoading || usersLoading">
+        <pulse-loader :loading="invitesLoading"></pulse-loader>
+      </div>
+      <div v-else class="list-container">
         <items-list :items="invites"
                     :page="'users'"
                     :user-group="1"
+                    :party_id="this.$route.params.id"
                     @showItem="showUser"/>
       </div>
     </div>
@@ -32,7 +36,10 @@
 
     <div class="party-items">
       <div>MENU</div>
-      <div class="list-container">
+      <div v-if="cocktailsLoading">
+        <pulse-loader :loading="true"></pulse-loader>
+      </div>
+      <div v-else class="list-container">
         <items-list :items="party.menu"
                     :page="'menu'"
                     :party_id="this.$route.params.id"
@@ -63,14 +70,16 @@
 
     <div class="party-items">
       <div>STOCKS</div>
-      <div class="list-container">
+      <div v-if="stocksLoading">
+        <pulse-loader :loading="stocksLoading"></pulse-loader>
+      </div>
+      <div v-else class="list-container">
         <items-list :items="purchases"
                     :page="'purchases'"
                     :user-group="1"
                     @addItem="showPurchaseDialog"
                     @editItem="showPurchaseEditDialog"
                     @deleteItem="showSureEdit"/>
-
       </div>
     </div>
   </div>
@@ -116,6 +125,12 @@ export default {
       purchaseSureId: Number,
       purchaseAddIsError: false,
       purchaseAddErrorText: "",
+
+      cocktailsLoading: true,
+      partiesLoading: true,
+      usersLoading: true,
+      invitesLoading: true,
+      stocksLoading: true
     }
   },
   methods: {
@@ -208,52 +223,66 @@ export default {
       this.purchaseSureId = -1
       this.purchaseSureName = ""
     },
-    async fetchCocktails() {
-      try {
-        const response = await axios.get(this.api_url + 'cocktails/all')
-        this.$store.commit("items/updateCocktails", response.data)
-        this.cocktails = this.$store.state.items.cocktails
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchCocktails() {
+      axios
+          .get(this.api_url + 'cocktails/all')
+          .then(response => {
+            this.$store.commit("items/updateCocktails", response.data)
+            this.cocktails = this.$store.state.items.cocktails
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.cocktailsLoading = false)
     },
-    async fetchParties() {
-      try {
-        const response = await axios.get(this.api_url + 'parties/all')
-        this.$store.commit("items/updateParties", response.data)
-        this.parties = this.$store.state.items.parties
-        this.party = this.parties.find(x => x.id === parseInt(this.$route.params.id))
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchParties() {
+      axios
+          .get(this.api_url + 'parties/all')
+          .then(response => {
+            this.$store.commit("items/updateParties", response.data)
+            this.parties = this.$store.state.items.parties
+            this.party = this.parties.find(x => x.id === parseInt(this.$route.params.id))
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.partiesLoading = false)
     },
-    async fetchUsers() {
-      try {
-        const response = await axios.get(this.api_url + 'users/all')
-        this.$store.commit("items/updateUsers", response.data)
-        this.users = this.$store.state.items.users
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchUsers() {
+      axios
+          .get(this.api_url + 'users/all')
+          .then(response => {
+            this.$store.commit("items/updateUsers", response.data)
+            this.users = this.$store.state.items.users
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.usersLoading = false)
     },
-    async fetchInvites() {
-      try {
-        const response = await axios.get(this.api_url + 'users/invites?party_id=' + this.$route.params.id)
-        this.invites = response.data
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchInvites() {
+      axios
+          .get(this.api_url + 'users/invites?party_id=' + this.$route.params.id)
+          .then(response => {
+            this.invites = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.invitesLoading = false)
     },
-    async fetchPurchases() {
-      try {
-        const response = await axios.get(this.api_url + 'purchases/party?id=' + this.$route.params.id)
-        // const response = await axios.get(this.api_url + 'purchases/party?id=' + 1)
-        // this.$store.commit("items/updatePurchases", response.data)
-        // this.purchases = this.$store.state.items.purchases
-        this.purchases = response.data
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchPurchases() {
+      axios
+          .get(this.api_url + 'purchases/party?id=' + this.$route.params.id)
+          .then(response => {
+            this.purchases = response.data
+            console.log("PURCHASES LOADED")
+            console.log(this.purchases)
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.stocksLoading = false)
     },
     formatDate(date) {
       var day = new Date(Date.parse(date)).getDate()

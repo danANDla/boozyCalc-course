@@ -6,6 +6,8 @@ import MyTabz from "@/components/UI/MyTabz";
 import AreYouSure from "@/components/UI/AreYouSure";
 import DropDown from "@/components/UI/DropDown";
 import ItemPicker from "@/components/UI/ItemPicker";
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+
 
 export default [
     button,
@@ -15,5 +17,6 @@ export default [
     MyTabz,
     AreYouSure,
     DropDown,
-    ItemPicker
+    ItemPicker,
+    PulseLoader
 ];

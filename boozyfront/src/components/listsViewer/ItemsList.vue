@@ -7,24 +7,28 @@
 
       <div v-if="page==='cocktails'" class="cocktail-container" @click="showItem(item.id)">
         <div class="item-name"> {{ item.name }}</div>
-        <div class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
+        <div v-show="!ingredientsLoading" class="item-recipe"> {{ getIngredientsString(item.ingredients) }}</div>
       </div>
+
       <div v-else-if="page==='menu'" class="menu-container" @click="showItem(item)">
-        <div class="cocktail-container">
-          <div class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
-          <div class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
-        </div>
-        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity">
-          <div>
-            {{this.availableCocktails.find(x => x.cocktail_id === item).quantity}}
+          <div class="cocktail-container">
+            <div v-if="!cocktailsLoading" class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
+            <div v-if="!ingredientsLoading" class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
           </div>
-        </div>
-        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity-green"/>
-        <div v-else class="quantity-red"/>
+
+          <div v-if="!availableCocktailsLoading && this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity">
+            <div>
+              {{ this.availableCocktails.find(x => x.cocktail_id === item).quantity }}
+            </div>
+          </div>
+          <div v-if="!availableCocktailsLoading && this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity-green"/>
+          <div v-else class="quantity-red"/>
       </div>
+
       <div v-else-if="page==='users'" class="cocktail-container" @click="showItem(item.person_id)">
         <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
       </div>
+
       <div v-else class="item-body" @click="showItem(item.id)">
         <div v-if="page==='products' && this.ingredients !== undefined">
           <div class="item-name">{{ item.name }}</div>
@@ -37,10 +41,10 @@
           <div class="item-info"> {{ item.location }}</div>
         </div>
         <div v-else-if="page==='purchases'">
-          <div class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
-          <div class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
-          <div class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
-          <div class="item-name"> {{ item.quantity }} </div>
+          <div v-if="!productsLoading" class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
+          <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
+          <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
+          <div class="item-name"> {{ item.quantity }}</div>
         </div>
         <div v-else>
           <div class="item-name">{{ item.name }}</div>
@@ -57,7 +61,8 @@
           </div>
         </div>
         <div class="nav-option" @mouseover="this.makeRed(index)" @mouseleave="this.makeNotRed(index)">
-          <div v-if="page==='purchases'" class="nav-icon" @click="deleteItem(item.product_id, products.find(x => x.id === item.product_id).name)">
+          <div v-if="page==='purchases'" class="nav-icon"
+               @click="deleteItem(item.product_id, products.find(x => x.id === item.product_id).name)">
             <font-awesome-icon icon="fas fa-trash"/>
           </div>
           <div v-else class="nav-icon-trash" @click="deleteItem(item.id, item.name)">
@@ -66,7 +71,8 @@
         </div>
       </div>
     </div>
-    <div class="add-item-btn-container" @click="addItem" v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients' && page !=='products'">
+    <div class="add-item-btn-container" @click="addItem"
+         v-if="userGroup===1 && page!=='users' && page!=='menu' && page !=='ingredients' && page !=='products'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -110,7 +116,14 @@ export default {
       availableCocktails: undefined,
       products: this.$store.state.items.products,
       users: this.$store.state.items.users,
+      groupedOrder: undefined,
       api_url: "http://127.0.0.1:8080/api/",
+
+      cocktailsLoading: true,
+      usersLoading: true,
+      availableCocktailsLoading: true,
+      productsLoading: true,
+      ingredientsLoading: true
     }
   },
   methods: {
@@ -167,66 +180,79 @@ export default {
         month = '0' + month
       }
 
-      return day + " " + monthStr[month-1] + " " + year
+      return day + " " + monthStr[month - 1] + " " + year
     },
-    async fetchCocktails() {
-      try {
-        const response = await axios.get(this.api_url + 'cocktails/all')
-        this.$store.commit("items/updateCocktails", response.data)
-        this.cocktails = this.$store.state.items.cocktails
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchCocktails() {
+      axios
+          .get(this.api_url + 'cocktails/all')
+          .then(response => {
+            this.$store.commit("items/updateCocktails", response.data)
+            this.cocktails = this.$store.state.items.cocktails
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.cocktailsLoading = false)
     },
-    async fetchIngredients() {
-      try {
-        const response = await axios.get(this.api_url + 'ingredients/all')
-        this.$store.commit("items/updateIngredients", response.data)
-        this.ingredients = this.$store.state.items.ingredients
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchIngredients() {
+      axios
+          .get(this.api_url + 'ingredients/all')
+          .then(response => {
+            this.$store.commit("items/updateIngredients", response.data)
+            this.ingredients = this.$store.state.items.ingredients
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.ingredientsLoading = false)
     },
-    async fetchProducts() {
-      try {
-        const response = await axios.get(this.api_url + 'products/all')
-        this.$store.commit("items/updateProducts", response.data)
-        this.products = this.$store.state.items.products
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchProducts() {
+      axios
+          .get(this.api_url + 'products/all')
+          .then(response => {
+            this.$store.commit("items/updateProducts", response.data)
+            this.products = this.$store.state.items.products
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.productsLoading = false)
     },
-    async fetchUsers() {
-      try {
-        const response = await axios.get(this.api_url + 'users/all')
-        this.$store.commit("items/updateUsers", response.data)
-        this.users = this.$store.state.items.users
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchUsers() {
+      axios
+          .get(this.api_url + 'users/all')
+          .then(response => {
+            this.$store.commit("items/updateUsers", response.data)
+            this.users = this.$store.state.items.users
+            console.log(this.party_id, this.items)
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.usersLoading = false)
     },
-    async getAvailableCocktails(){
-      try {
-        const response = await axios.get(this.api_url + 'parties/available?id=' + this.party_id)
-        this.availableCocktails = response.data
-        console.log(this.availableCocktails)
-      } catch (e) {
-        alert(e.message)
-      }
-    }
-  },
-  beforeMount() {
-    this.fetchCocktails()
-    this.fetchIngredients()
-    this.fetchProducts()
-    if(this.page === 'users'){
-      this.fetchUsers()
-    }
-    if(this.page === 'menu'){
-      this.getAvailableCocktails()
+    getAvailableCocktails() {
+      axios
+          .get(this.api_url + 'parties/available?id=' + this.party_id)
+          .then(response => {
+            this.availableCocktails = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.availableCocktailsLoading = false)
     }
   },
   mounted() {
+    this.fetchCocktails()
+    this.fetchIngredients()
+    this.fetchProducts()
+    if (this.page === 'users') {
+      this.fetchUsers()
+    }
+    if (this.page === 'menu') {
+      this.getAvailableCocktails()
+    }
   },
   beforeUpdate() {
     this.itemRefs = []
@@ -329,7 +355,7 @@ export default {
   cursor: pointer;
 }
 
-.menu-container{
+.menu-container {
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -338,20 +364,20 @@ export default {
   align-items: center;
 }
 
-.quantity{
+.quantity {
   height: 100%;
   padding-right: 10px;
   align-items: center;
   display: flex;
 }
 
-.quantity-green{
+.quantity-green {
   background-color: limegreen;
   height: 100%;
   width: 10px;
 }
 
-.quantity-red{
+.quantity-red {
   background-color: darkred;
   height: 100%;
   width: 10px;
