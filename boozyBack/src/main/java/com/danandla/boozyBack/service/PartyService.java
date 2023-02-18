@@ -5,6 +5,7 @@ import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameUsedException;
 import com.danandla.boozyBack.exception.ItemNotAddedException;
+import com.danandla.boozyBack.model.GroupedOrderModel;
 import com.danandla.boozyBack.model.OrderModel;
 import com.danandla.boozyBack.model.PartyModel;
 import com.danandla.boozyBack.repository.*;
@@ -122,12 +123,12 @@ public class PartyService {
         } else throw new ItemNameNotFoundException("party with this id wasn't found");
     }
 
-    public ArrayList<InviteEntity> getInvites(long partyId) throws ItemNameNotFoundException {
+    public ArrayList<InviteEntity> getInvites(long partyId) throws ItemIdNotFoundException {
         PartyEntity t = partiesRepo.findById(partyId).get();
         if (t != null) {
             ArrayList<InviteEntity> list = (ArrayList<InviteEntity>) inviteRepo.findByPartId(partyId);
             return list;
-        } else throw new ItemNameNotFoundException("party with this id wasn't found");
+        } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
 
     public ArrayList<AvailableCocktailsEntity> getAvailableCocktails(long partyId) throws ItemIdNotFoundException {
@@ -146,10 +147,19 @@ public class PartyService {
         } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
 
-    public ArrayList<GroupedOrderEntity> getGroupedOrders(long partyId, long personId) throws ItemIdNotFoundException {
+    public ArrayList<GroupedOrderModel> getGroupedOrders(long partyId) throws ItemIdNotFoundException {
         PartyEntity t = partiesRepo.findById(partyId).get();
+        ArrayList<InviteEntity> invites = getInvites(partyId);
         if (t != null) {
-            ArrayList<GroupedOrderEntity> list = (ArrayList<GroupedOrderEntity>) orderRepo.findGroupedOrder(partyId, personId);
+            ArrayList<GroupedOrderModel> list = new ArrayList<>();
+            for(InviteEntity i: invites){
+                ArrayList<GroupedOrderItemEntity> items = (ArrayList<GroupedOrderItemEntity>) orderRepo.findGroupedOrder(partyId, i.getPerson_id());
+                float price = 0;
+                for(GroupedOrderItemEntity item: items) price += item.getPrice();
+                GroupedOrderModel groupedOrder = new GroupedOrderModel(i.getPerson_id(), items, price);
+                System.out.println(groupedOrder);
+                list.add(groupedOrder);
+            }
             return list;
         } else throw new ItemIdNotFoundException("party with this id wasn't found");
     }
@@ -170,15 +180,11 @@ public class PartyService {
         if (partiesRepo.findById(newOrder.getParty_id()).isEmpty())
             throw new ItemIdNotFoundException("party with this id was not found");
 
-//        Long orderId = orderRepoAdd.addOrder(newOrder.getParty_id(), newOrder.getCocktail_id(), newOrder.getPerson_id(), 1L);
         Long orderId = -1L;
         try {
             orderId = orderRepo.addOrder(newOrder.getParty_id(), newOrder.getCocktail_id(), newOrder.getPerson_id());
         } catch (DataAccessException e) {
-            System.out.println("VBBBBBBBBBBB");
             Throwable root = findCauseUsingPlainJava(e);
-            System.out.println(root.getMessage());
-            System.out.println("AAAAAAAAAA");
             throw new ItemNotAddedException(root.getMessage().split("\n", 2)[0]);
         }
         if (orderRepo.findById(orderId).isPresent()) return orderRepo.findById(orderId).get();

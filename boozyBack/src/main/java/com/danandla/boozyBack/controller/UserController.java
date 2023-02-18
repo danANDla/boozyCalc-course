@@ -1,6 +1,7 @@
 package com.danandla.boozyBack.controller;
 
 
+import com.danandla.boozyBack.exception.ItemIdNotFoundException;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
 import com.danandla.boozyBack.service.PartyService;
 import com.danandla.boozyBack.service.UserService;
@@ -45,7 +46,7 @@ public class UserController {
     public ResponseEntity getInvites(@RequestParam Long party_id) {
         try {
             return ResponseEntity.ok(partyService.getInvites(party_id));
-        } catch (ItemNameNotFoundException e) {
+        } catch (ItemIdNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
