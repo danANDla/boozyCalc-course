@@ -16,15 +16,18 @@
 
     <div class="party-items">
       <div>INVITES</div>
-      <div v-if="invitesLoading || usersLoading">
-        <pulse-loader :loading="invitesLoading"></pulse-loader>
+      <div v-if="invitesLoading || usersLoading || groupedOrdersLoading">
+        <pulse-loader :loading="true"></pulse-loader>
       </div>
       <div v-else class="list-container">
         <items-list :items="invites"
+                    :users="users"
+                    :grouped-orders="groupedOrders"
                     :page="'invites'"
                     :user-group="1"
                     :party_id="this.$route.params.id"
-                    @showItem="showUser"/>
+                    @showItem="showUser"
+                    @addOrder="addOrder"/>
       </div>
     </div>
 
@@ -34,13 +37,25 @@
       </div>
     </dialog-window>
 
+    <dialog-window v-model:show="addOrderFormVisible">
+      <div class="info-container">
+        <add-order-form :party_id="this.$route.params.id"
+                        :cocktails-loading="this.cocktailsLoading"
+                        :menu="party.menu"
+                        :person_id="currentUser"/>
+      </div>
+    </dialog-window>
+
     <div class="party-items">
       <div>MENU</div>
-      <div v-if="cocktailsLoading">
+      <div v-if="cocktailsLoading || availableCocktailsLoading || ingredientsLoading || partiesLoading">
         <pulse-loader :loading="true"></pulse-loader>
       </div>
       <div v-else class="list-container">
         <items-list :items="party.menu"
+                    :available-cocktails="availableCocktails"
+                    :cocktails="cocktails"
+                    :ingredients="ingredients"
                     :page="'menu'"
                     :party_id="this.$route.params.id"
                     :user-group="1"
@@ -70,11 +85,12 @@
 
     <div class="party-items">
       <div>STOCKS</div>
-      <div v-if="stocksLoading">
-        <pulse-loader :loading="stocksLoading"></pulse-loader>
+      <div v-if="stocksLoading || productsLoading">
+        <pulse-loader :loading="true"></pulse-loader>
       </div>
       <div v-else class="list-container">
         <items-list :items="purchases"
+                    :products="products"
                     :page="'purchases'"
                     :user-group="1"
                     @addItem="showPurchaseDialog"
@@ -95,28 +111,47 @@ import AreYouSure from "../../components/UI/AreYouSure";
 import AddPartyForm from "../../components/partiesViewer/AddPartyForm";
 import AddPurchaseForm from "../../components/partiesViewer/AddPurchaseForm";
 import CocktailInfo from "../../components/listsViewer/CocktailInfo";
+import AddOrderForm from "@/components/listsViewer/AddOrderForm";
 
 export default {
   name: "AdminPartyInfo",
-  components: {CocktailInfo, AddPurchaseForm, ItemsList, DialogWindow, AddPartyForm, AreYouSure},
+  components: {AddOrderForm, CocktailInfo, AddPurchaseForm, ItemsList, DialogWindow, AddPartyForm, AreYouSure},
   data() {
     return {
-      cocktails: this.$store.state.items.cocktails,
-      parties: this.$store.state.items.parties,
-      purchases: this.$store.state.items.pusrchases,
-      users: this.$store.state.items.users,
-      invites: undefined,
       api_url: "http://127.0.0.1:8080/api/",
       party: {
         menu: []
       },
-
-      currentUser: undefined,
-      userInfoVisible: false,
-
+      cocktails: this.$store.state.items.cocktails,
+      cocktailsLoading: true,
       currentCocktail: undefined,
       cocktailInfoVisible: false,
 
+      parties: this.$store.state.items.parties,
+      partiesLoading: true,
+
+      ingredients: this.$store.state.items.ingredients,
+      ingredientsLoading: true,
+
+      products: this.$store.state.items.products,
+      productsLoading: true,
+
+      availableCocktails: undefined,
+      availableCocktailsLoading: true,
+
+      users: this.$store.state.items.users,
+      usersLoading: true,
+      currentUser: undefined,
+      userInfoVisible: false,
+
+      invites: undefined,
+      invitesLoading: true,
+
+      groupedOrders: [],
+      groupedOrdersLoading: true,
+
+      purchases: this.$store.state.items.pusrchases,
+      stocksLoading: true,
       currentPurchase: undefined,
       purchaseSureVisible: false,
       purchaseDialogVisible: false,
@@ -126,17 +161,17 @@ export default {
       purchaseAddIsError: false,
       purchaseAddErrorText: "",
 
-      cocktailsLoading: true,
-      partiesLoading: true,
-      usersLoading: true,
-      invitesLoading: true,
-      stocksLoading: true
+      addOrderFormVisible: false,
     }
   },
   methods: {
     showUser(id){
       this.userInfoVisible = true
       this.currentUser = this.invites.find(x => x.person_id === id)
+    },
+    addOrder(id){
+      this.addOrderFormVisible = true
+      this.currentUser = id
     },
     showCocktailsInfo(id){
       this.currentCocktail = this.cocktails.find(x => x.id === id)
@@ -284,6 +319,52 @@ export default {
           })
           .finally(() => this.stocksLoading = false)
     },
+    getAvailableCocktails() {
+      axios
+          .get(this.api_url + 'parties/available?id=' + this.$route.params.id)
+          .then(response => {
+            this.availableCocktails = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.availableCocktailsLoading = false)
+    },
+    fetchIngredients() {
+      axios
+          .get(this.api_url + 'ingredients/all')
+          .then(response => {
+            this.$store.commit("items/updateIngredients", response.data)
+            this.ingredients = this.$store.state.items.ingredients
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.ingredientsLoading = false)
+    },
+    fetchProducts() {
+      axios
+          .get(this.api_url + 'products/all')
+          .then(response => {
+            this.$store.commit("items/updateProducts", response.data)
+            this.products = this.$store.state.items.products
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.productsLoading = false)
+    },
+    getGroupedOrders() {
+      axios
+          .get(this.api_url + 'parties/grouped?id=' + this.$route.params.id)
+          .then(response => {
+            this.groupedOrders = response.data
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.groupedOrdersLoading = false)
+    },
     formatDate(date) {
       var day = new Date(Date.parse(date)).getDate()
       var month = new Date(Date.parse(date)).getMonth() + 1
@@ -298,11 +379,16 @@ export default {
   },
   mounted() {
     console.log("fetching")
+    this.fetchIngredients()
     this.fetchCocktails()
     this.fetchParties()
     this.fetchPurchases()
     this.fetchUsers()
     this.fetchInvites()
+    this.getAvailableCocktails()
+    this.fetchProducts()
+    this.getGroupedOrders()
+    this.fetchUsers()
   }
 }
 </script>
