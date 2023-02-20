@@ -11,26 +11,55 @@
       </div>
 
       <div class="menu-container" v-else-if="page==='menu'" @click="showItem(item)">
-          <div class="cocktail-container">
-            <div v-if="!cocktailsLoading" class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
-            <div v-if="!ingredientsLoading" class="item-recipe"> {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}</div>
+        <div class="cocktail-container">
+          <div class="item-name"> {{ cocktails.find(x => x.id === item).name }}</div>
+          <div class="item-recipe">
+            {{ getIngredientsString(cocktails.find(x => x.id === item).ingredients) }}
           </div>
+        </div>
 
-          <div v-if="!availableCocktailsLoading && this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity">
-            <div>
-              {{ this.availableCocktails.find(x => x.cocktail_id === item).quantity }}
-            </div>
+        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0"
+             class="quantity">
+          <div>
+            {{ this.availableCocktails.find(x => x.cocktail_id === item).quantity }}
           </div>
-          <div v-if="!availableCocktailsLoading && this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0" class="quantity-green"/>
-          <div v-else class="quantity-red"/>
+        </div>
+        <div v-if="this.availableCocktails.find(x => x.cocktail_id === item).quantity > 0"
+             class="quantity-green"/>
+        <div v-else class="quantity-red"/>
       </div>
 
-      <div class="invites-container" v-else-if="page==='invites'" @click="showItem(item.person_id)">
-        <div class="item-name">{{ users.find(x => x.id === item.person_id).name }}</div>
-        <div class="item-info" v-if="!groupedOrdersLoading"> {{ getGroupedOrderString(item.person_id) }} </div>
+      <div class="menu-container" v-else-if="page==='orderMenu'" @click="showItem(item)">
+        <div class="cocktail-container">
+          <div class="item-name"> {{ this.cocktails.find(x => x.id === item.cocktail_id).name }}</div>
+          <div class="item-recipe">
+            {{ getIngredientsString(this.cocktails.find(x => x.id === item.cocktail_id).ingredients) }}
+          </div>
+        </div>
+
+        <div class="quantity">
+          <div>
+            {{ item.quantity }}
+          </div>
+        </div>
       </div>
 
-      <div class = "products-container" v-else-if="page==='products' && this.ingredients !== undefined" @click="showItem(item.id)">
+      <div class="invites-container" v-else-if="page==='invites'">
+        <div class="item-name" @click="showItem(item.person_id)">{{
+            users.find(x => x.id === item.person_id).name
+          }}
+        </div>
+        <div class="item-info"  @click="showItem(item.person_id)">
+          {{ getGroupedOrderString(item.person_id) }}
+        </div>
+        <div class="add-item-btn-container" @click="addOrder(item.person_id)"
+             v-if="userGroup===1">
+          <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
+        </div>
+      </div>
+
+      <div class="products-container" v-else-if="page==='products' && this.ingredients !== undefined"
+           @click="showItem(item.id)">
         <div class="item-name">{{ item.name }}</div>
         <div class="item-info"> {{ item.ingredientName }}</div>
         <div class="item-info"> {{ item.price }}</div>
@@ -43,9 +72,12 @@
       </div>
 
       <div class="purchases-container" v-else-if="page==='purchases'" @click="showItem(item.id)">
-        <div v-if="!productsLoading" class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
-        <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).ingredientName }}</div>
-        <div v-if="!productsLoading" class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
+        <div class="item-name">{{ products.find(x => x.id === item.product_id).name }}</div>
+        <div class="item-info">{{
+            products.find(x => x.id === item.product_id).ingredientName
+          }}
+        </div>
+        <div  class="item-info">{{ products.find(x => x.id === item.product_id).price }}</div>
         <div class="item-name"> {{ item.quantity }}</div>
       </div>
 
@@ -53,7 +85,7 @@
         <div class="item-name">{{ item.name }}</div>
       </div>
 
-      <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page!=='invites'">
+      <div class="item-navbar" v-if="userGroup===1 && page!=='menu' && page !=='orderMenu' && page!=='invites'">
         <div class="nav-option" @mouseover="this.makeWhite(index)" @mouseleave="this.makeNotWhite(index)">
           <div v-if="page==='purchases'" class="nav-icon" @click="editItem(item.product_id)">
             <font-awesome-icon icon="fa-solid fa-pen"/>
@@ -74,7 +106,7 @@
       </div>
     </div>
     <div class="add-item-btn-container" @click="addItem"
-         v-if="userGroup===1 && page!=='invites' && page!=='menu' && page !=='ingredients' && page !=='products'">
+         v-if="userGroup===1 && page!=='invites' && page!=='menu' && page !=='ingredients' && page !=='products' && page !== 'orderMenu'">
       <font-awesome-icon icon="fas fa-plus"></font-awesome-icon>
     </div>
 
@@ -104,7 +136,31 @@ export default {
     userGroup: {
       type: Number,
       required: true
-    }
+    },
+    cocktails: {
+      type: Array,
+      required: false
+    },
+    availableCocktails: {
+      type: Array,
+      required: false
+    },
+    ingredients: {
+      type: Array,
+      required: false
+    },
+    products: {
+      type: Array,
+      required: false
+    },
+    users: {
+      type: Array,
+      required: false
+    },
+    groupedOrders: {
+      type: Array,
+      required: false
+    },
   },
   data() {
     return {
@@ -113,20 +169,7 @@ export default {
       itemContainer: 'item-container',
       redItemContainer: 'red-item-container',
       whiteItemContainer: 'tan-item-container',
-      ingredients: this.$store.state.items.ingredients,
-      cocktails: this.$store.state.items.cocktails,
-      availableCocktails: undefined,
-      products: this.$store.state.items.products,
-      users: this.$store.state.items.users,
-      groupedOrders: undefined,
       api_url: "http://127.0.0.1:8080/api/",
-
-      cocktailsLoading: true,
-      usersLoading: true,
-      availableCocktailsLoading: true,
-      productsLoading: true,
-      ingredientsLoading: true,
-      groupedOrdersLoading: true
     }
   },
   methods: {
@@ -138,6 +181,9 @@ export default {
     },
     addItem() {
       this.$emit('addItem')
+    },
+    addOrder(id) {
+      this.$emit('addOrder', id)
     },
     deleteItem(id, name) {
       this.$emit('deleteItem', id, name)
@@ -185,80 +231,9 @@ export default {
 
       return day + " " + monthStr[month - 1] + " " + year
     },
-    fetchCocktails() {
-      axios
-          .get(this.api_url + 'cocktails/all')
-          .then(response => {
-            this.$store.commit("items/updateCocktails", response.data)
-            this.cocktails = this.$store.state.items.cocktails
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.cocktailsLoading = false)
-    },
-    fetchIngredients() {
-      axios
-          .get(this.api_url + 'ingredients/all')
-          .then(response => {
-            this.$store.commit("items/updateIngredients", response.data)
-            this.ingredients = this.$store.state.items.ingredients
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.ingredientsLoading = false)
-    },
-    fetchProducts() {
-      axios
-          .get(this.api_url + 'products/all')
-          .then(response => {
-            this.$store.commit("items/updateProducts", response.data)
-            this.products = this.$store.state.items.products
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.productsLoading = false)
-    },
-    fetchUsers() {
-      axios
-          .get(this.api_url + 'users/all')
-          .then(response => {
-            this.$store.commit("items/updateUsers", response.data)
-            this.users = this.$store.state.items.users
-            console.log(this.party_id, this.items)
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.usersLoading = false)
-    },
-    getAvailableCocktails() {
-      axios
-          .get(this.api_url + 'parties/available?id=' + this.party_id)
-          .then(response => {
-            this.availableCocktails = response.data
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.availableCocktailsLoading = false)
-    },
-    getGroupedOrders() {
-      axios
-          .get(this.api_url + 'parties/grouped?id=' + this.party_id)
-          .then(response => {
-            this.groupedOrders = response.data
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.groupedOrdersLoading = false)
-    },
-    getGroupedOrderString(person_id){
+    getGroupedOrderString(person_id) {
       let groupedOrder = this.groupedOrders.find(x => x.person_id === person_id)
-      if(groupedOrder.items.length === 0) return ""
+      if (groupedOrder.items.length === 0) return ""
       let retStr = ""
       let orderItem = {
         name: undefined,
@@ -277,18 +252,6 @@ export default {
       retStr += " x "
       retStr += orderItem.count
       return retStr
-    }
-  },
-  mounted() {
-    this.fetchCocktails()
-    this.fetchIngredients()
-    this.fetchProducts()
-    if (this.page === 'invites') {
-      this.fetchUsers()
-      this.getGroupedOrders()
-    }
-    if (this.page === 'menu') {
-      this.getAvailableCocktails()
     }
   },
   beforeUpdate() {
@@ -380,7 +343,8 @@ export default {
   align-items: center;
   user-select: none;
 }
-.products-container div, .parties-container div, .purchases-container div{
+
+.products-container div, .parties-container div, .purchases-container div {
   width: 100%;
   height: 100%;
   margin: 10px;
@@ -433,16 +397,19 @@ export default {
   font-weight: normal;
 }
 
-.invites-container{
+.invites-container {
   display: flex;
   width: 100%;
   user-select: none;
   margin: 10px;
+  align-items: center;
 }
-.invites-container .item-name{
+
+.invites-container .item-name {
   flex-grow: 1;
 }
-.invites-container .item-info{
+
+.invites-container .item-info {
   flex-grow: 1;
 }
 </style>
