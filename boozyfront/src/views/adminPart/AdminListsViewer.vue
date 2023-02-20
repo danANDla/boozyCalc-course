@@ -57,7 +57,8 @@
   </dialog-window>
   <dialog-window v-model:show="productsSureVisible">
     <div class="form-container">
-      <are-you-sure @sure="sure('products', productsSureId)" @notsure="notsure('products')"> Are you sure you want to delete
+      <are-you-sure @sure="sure('products', productsSureId)" @notsure="notsure('products')"> Are you sure you want to
+        delete
         {{ productsSureName }}?
       </are-you-sure>
     </div>
@@ -141,7 +142,16 @@ async function sendReq(url, reqMethod, params) {
 
 export default {
   name: "listsViewer",
-  components: {CocktailInfo, AddProductForm, AddCocktailForm, DialogWindow, RectButton, AddIngredientForm, TypedItemSection, Toggle},
+  components: {
+    CocktailInfo,
+    AddProductForm,
+    AddCocktailForm,
+    DialogWindow,
+    RectButton,
+    AddIngredientForm,
+    TypedItemSection,
+    Toggle
+  },
   data() {
     return {
       ingredients: this.$store.state.items.ingredients,
@@ -154,6 +164,10 @@ export default {
       prevProduct: undefined,
       prevIngredient: undefined,
       currentCocktail: undefined,
+
+      productsLoading: true,
+      cocktailsLoading: true,
+      ingredientsLoading: true,
 
       ingrsDialogVisible: false,
       ingrsSureVisible: false,
@@ -181,32 +195,41 @@ export default {
     }
   },
   methods: {
-    async fetchIngredients() {
-      try {
-        const response = await axios.get(this.api_url + 'ingredients/all')
-        this.$store.commit("items/updateIngredients", response.data)
-        this.ingredients = this.$store.state.items.ingredients
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchCocktails() {
+      axios
+          .get(this.api_url + 'cocktails/all')
+          .then(response => {
+            this.$store.commit("items/updateCocktails", response.data)
+            this.cocktails = this.$store.state.items.cocktails
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.cocktailsLoading = false)
     },
-    async fetchCocktails() {
-      try {
-        const response = await axios.get(this.api_url + 'cocktails/all')
-        this.$store.commit("items/updateCocktails", response.data)
-        this.cocktails = this.$store.state.items.cocktails
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchIngredients() {
+      axios
+          .get(this.api_url + 'ingredients/all')
+          .then(response => {
+            this.$store.commit("items/updateIngredients", response.data)
+            this.ingredients = this.$store.state.items.ingredients
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.ingredientsLoading = false)
     },
-    async fetchProducts() {
-      try {
-        const response = await axios.get(this.api_url + 'products/all')
-        this.$store.commit("items/updateProducts", response.data)
-        this.products = this.$store.state.items.products
-      } catch (e) {
-        alert(e.message)
-      }
+    fetchProducts() {
+      axios
+          .get(this.api_url + 'products/all')
+          .then(response => {
+            this.$store.commit("items/updateProducts", response.data)
+            this.products = this.$store.state.items.products
+          })
+          .catch(error => {
+            console.log(error)
+          })
+          .finally(() => this.productsLoading = false)
     },
     async fetchCocktailTypes() {
       try {
@@ -226,14 +249,12 @@ export default {
         this.ingrsSureVisible = false
         this.ingrSureId = -1
         this.ingrSureName = ""
-      }
-      else if(type === 'products'){
+      } else if (type === 'products') {
         this.deleteProduct(id)
         this.productsSureVisible = false
         this.productsSureId = -1
         this.productsSureName = ""
-      }
-      else {
+      } else {
         console.log(type + ' ' + id)
         this.deleteCocktail(id)
         this.cocksSureVisible = false
@@ -278,7 +299,7 @@ export default {
         badNewItem = true
         this.ingredientsAddErrorText = "empty name field"
       }
-      if(!badNewItem){
+      if (!badNewItem) {
         await axios.post(this.api_url + 'ingredients/' + args.url, newIngredient)
             .then(function (response) {
               status = true;
@@ -337,7 +358,7 @@ export default {
       this.cocksSureVisible = true
       console.log('trying delete ' + id)
     },
-    showCocktailsInfo(id){
+    showCocktailsInfo(id) {
       this.cocktailsInfoVisible = true
       console.log('showCocktailsInfo', id)
       this.currentCocktail = this.cocktails.find(x => x.id === id)
@@ -428,7 +449,7 @@ export default {
         badNewItem = true
         this.productsAddErrorText = "empty name field"
       }
-      if(!badNewItem){
+      if (!badNewItem) {
         await axios.post(this.api_url + 'products/' + args.url, newProduct)
             .then(function (response) {
               status = true;
@@ -482,21 +503,9 @@ export default {
         alert(e.message)
       }
     },
-    getTypeName(id){
+    getTypeName(id) {
       return this.ingredientTypes.find(x => x.id === id).name
     },
-    test(){
-      console.log('test')
-      var arr = this.ingredients.filter(y => y.id === 2)
-      let item = 0
-      arr = this.ingredients.filter(y => y.id === 1)[0]
-      console.log(typeof arr, arr.type)
-      for(item in this.distinctIngredientTypes){
-        arr = this.products.filter(x => (this.ingredients.filter(y => y.id === x.ingredientId)[0]).type == item)
-        arr = (this.ingredients.filter(y => y.id === 1)).type
-        console.log(arr)
-      }
-    }
   },
   mounted() {
     console.log("Fetching")
