@@ -30,7 +30,7 @@
 
     <dialog-window v-model:show="cocktailInfoVisible">
       <div class="info-container">
-        <cocktail-info :cocktail="currentCocktail"></cocktail-info>
+        <cocktail-info :cocktail="currentCocktail" :party_id="this.$route.params.id"></cocktail-info>
       </div>
     </dialog-window>
 
@@ -401,5 +401,9 @@ export default {
 .party-items > *:first-child {
   padding: 10px;
   background-color: #69AAB8;
+}
+
+.v-spinner{
+  text-align: center;
 }
 </style>
