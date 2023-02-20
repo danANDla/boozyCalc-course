@@ -37,6 +37,5 @@ export default {
 }
 
 .content{
-  background-color: #3D5E6B;
 }
 </style>

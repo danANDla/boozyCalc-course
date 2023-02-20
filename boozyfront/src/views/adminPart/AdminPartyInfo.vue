@@ -401,7 +401,6 @@ export default {
 
 .body-container > div {
   width: 100%;
-  background-color: black;
   /*border: skyblue 1px solid;*/
 }
 
@@ -480,8 +479,13 @@ export default {
   height: 100%;
 }
 
+.party-info{
+  background: black;
+}
+
 .party-items {
   margin-top: 25px;
+  background: black;
 }
 
 .party-items > *:first-child {
