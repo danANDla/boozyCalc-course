@@ -45,8 +45,6 @@ public class ProductService {
     }
 
     public ProductEntity addProduct(ProductEntity newProduct) throws ItemNameUsedException, ItemIdNotFoundException {
-        if (productRepo.findByName(newProduct.getName()) != null)
-            throw new ItemNameUsedException("product with this name already exists");
         if (ingredientRepo.findById(newProduct.getIngredientId()).isEmpty())
             throw new ItemIdNotFoundException("ingredient with this id was not found");
 
