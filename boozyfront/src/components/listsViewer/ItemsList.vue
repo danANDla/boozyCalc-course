@@ -29,7 +29,7 @@
         <div v-else class="quantity-red"/>
       </div>
 
-      <div class="menu-container" v-else-if="page==='orderMenu'" @click="showItem(item)">
+      <div class="menu-container" v-else-if="page==='orderMenu'" @click="selectOrder(item, index)">
         <div class="cocktail-container">
           <div class="item-name"> {{ this.cocktails.find(x => x.id === item.cocktail_id).name }}</div>
           <div class="item-recipe">
@@ -182,6 +182,11 @@ export default {
     addItem() {
       this.$emit('addItem')
     },
+    selectOrder(id, index) {
+      this.$emit('selectOrder', id)
+      this.isColor.fill( 0)
+      this.isColor[index] = 2
+    },
     addOrder(id) {
       this.$emit('addOrder', id)
     },
@@ -265,7 +270,6 @@ export default {
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 10px;
 }
 
 ::-webkit-scrollbar {
