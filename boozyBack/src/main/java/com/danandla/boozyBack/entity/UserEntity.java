@@ -3,14 +3,22 @@ package com.danandla.boozyBack.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "people")
+@Table(name = "users")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String username;
+    private String password;
+    private String realName;
 
     public UserEntity() {
+    }
+
+    public UserEntity(String userName, String password, String realName) {
+        this.username = userName;
+        this.password = password;
+        this.realName = realName;
     }
 
     public Long getId() {
@@ -21,11 +29,27 @@ public class UserEntity {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserName(String userName) {
+        this.username = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 }
