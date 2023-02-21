@@ -9,9 +9,9 @@
     </div>
 
     <dialog-window v-model:show="userInfoVisible">
-<!--      <div class="info-container">-->
-<!--        <user-info :user="this.currentUser"></user-info>-->
-<!--      </div>-->
+      <!--      <div class="info-container">-->
+      <!--        <user-info :user="this.currentUser"></user-info>-->
+      <!--      </div>-->
     </dialog-window>
 
     <div class="party-items">
@@ -42,7 +42,10 @@
         <add-order-form :party_id="this.$route.params.id"
                         :cocktails-loading="this.cocktailsLoading"
                         :menu="party.menu"
-                        :person_id="currentUser"/>
+                        :person="{id: currentUser, name: this.users.find(x => x.id ===currentUser).name}"
+                        :error-text="this.orderAddErrorText"
+                        :is-error="this.orderAddIsError"
+                        @submitData="sendOrder"/>
       </div>
     </dialog-window>
 
@@ -67,17 +70,18 @@
     <dialog-window v-model:show="purchaseDialogVisible">
       <div class="form-container">
         <add-purchase-form @submitData="sendPurchase"
-                        @input="this.purchaseAddIsError = false; this.purchaseAddErrorText=''"
-                        :is-error="purchaseAddIsError"
-                        :error-text="purchaseAddErrorText"
-                        :prev-purchase="currentPurchase">
+                           @input="this.purchaseAddIsError = false; this.purchaseAddErrorText=''"
+                           :is-error="purchaseAddIsError"
+                           :error-text="purchaseAddErrorText"
+                           :prev-purchase="currentPurchase">
         </add-purchase-form>
       </div>
     </dialog-window>
 
     <dialog-window v-model:show="purchaseSureVisible">
       <div class="form-container">
-        <are-you-sure @sure="sure('parties', purchaseSureId)" @notsure="notsure('parties')"> Are you sure you want to delete
+        <are-you-sure @sure="sure('parties', purchaseSureId)" @notsure="notsure('parties')"> Are you sure you want to
+          delete
           {{ purchaseSureName }}?
         </are-you-sure>
       </div>
@@ -162,18 +166,20 @@ export default {
       purchaseAddErrorText: "",
 
       addOrderFormVisible: false,
+      orderAddIsError: false,
+      orderAddErrorText: "",
     }
   },
   methods: {
-    showUser(id){
+    showUser(id) {
       this.userInfoVisible = true
       this.currentUser = this.invites.find(x => x.person_id === id)
     },
-    addOrder(id){
+    addOrder(id) {
       this.addOrderFormVisible = true
       this.currentUser = id
     },
-    showCocktailsInfo(id){
+    showCocktailsInfo(id) {
       this.currentCocktail = this.cocktails.find(x => x.id === id)
       this.cocktailInfoVisible = true
     },
@@ -203,8 +209,7 @@ export default {
         this.purchaseAddIsError = true
         badNewItem = true
         this.purchaseAddErrorText = "empty quantity field"
-      }
-      else if (newPurchase.quantity < 0 ) {
+      } else if (newPurchase.quantity < 0) {
         this.purchaseAddIsError = true
         badNewItem = true
         this.purchaseAddErrorText = "quantity value should be above zero"
@@ -376,6 +381,45 @@ export default {
       if (minute < 10) minute = '0' + minute
       return day + "." + month + " " + hour + ":" + minute
     },
+    async sendOrder(args) {
+      let newOrder = args.order
+      let status = false
+      let errorText = ""
+      let badNewItem = false
+      if (!badNewItem) {
+        await axios.post(this.api_url + 'parties/order', newOrder)
+            .then(function (response) {
+              status = true;
+              console.log(response.status.valueOf())
+            })
+            .catch(function (error) {
+              if (error.response) {
+                // Request made and server responded
+                console.log(error.response.data);
+                errorText = error.response.data
+              } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
+            })
+        if (status === true) {
+          this.stocksLoading = true;
+          this.groupedOrdersLoading = true;
+          this.availableCocktailsLoading = true;
+          this.fetchPurchases()
+          this.getGroupedOrders()
+          this.getAvailableCocktails()
+          this.addOrderFormVisible = false
+        } else {
+          console.log("is Error")
+          this.orderAddIsError = true
+          this.orderAddErrorText = errorText
+        }
+      }
+    },
   },
   mounted() {
     console.log("fetching")
@@ -479,7 +523,7 @@ export default {
   height: 100%;
 }
 
-.party-info{
+.party-info {
   background: black;
 }
 
@@ -493,7 +537,7 @@ export default {
   background-color: #69AAB8;
 }
 
-.v-spinner{
+.v-spinner {
   text-align: center;
 }
 </style>
