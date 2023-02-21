@@ -16,7 +16,7 @@
             <div class="item-container" v-for="(item, index) in this.cocktail.ingredients">
               <div class="needed-remain" v-if="!neededIngredientsLoading && needed.some(x => x.ingredient_id === item.ingredientId)">
                 <div class="quantity-red"/>
-                <div>{{ needed.find(x => x.ingredient_id === item.ingredientId).remain }}</div>
+                <div class="quantity">{{ needed.find(x => x.ingredient_id === item.ingredientId).remain }}</div>
               </div>
               <div v-else>
                 <div class="quantity-green"/>
@@ -206,6 +206,11 @@ div.item-container{
 .needed-remain{
   display: flex;
   flex-direction: row;
+  align-items: end;
+}
+
+.quantity{
+  font-size: 10px;
 }
 
 </style>
