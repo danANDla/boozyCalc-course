@@ -8,6 +8,12 @@ const initialState = user
 export const auth = {
     namespaced: true,
     state: initialState,
+    getters:{
+        getUser(){
+            console.log( JSON.parse(window.sessionStorage.getItem("vuex")).auth.user)
+            return JSON.parse(window.sessionStorage.getItem("vuex")).auth.user
+        }
+    },
     actions: {
         login({ commit }, user) {
             return AuthService.login(user).then(

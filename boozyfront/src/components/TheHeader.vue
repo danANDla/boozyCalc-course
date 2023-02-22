@@ -6,6 +6,9 @@
 
     <ul class="nav">
       <li>
+        <div v-if="this.loggedIn" class="name"> {{ userName }} </div>
+      </li>
+      <li>
         <router-link v-if="!this.loggedIn"  to="/start"> log in </router-link>
         <div v-if="this.loggedIn" class="logout" @click="logout"> log out </div>
       </li>
@@ -20,6 +23,11 @@ export default {
   computed:{
     loggedIn(){
       return this.$store.state.auth.status.loggedIn;
+    },
+    userName(){
+      let user = this.$store.getters['auth/getUser']
+      console.log(user)
+      return user.realName
     }
   },
   methods:{
@@ -56,14 +64,19 @@ export default {
   margin-left: 25px;
 }
 
-.container ul li a,div:hover{
+.container ul li a,.logout:hover{
   color: #CFE5EE;
 }
 
-.container ul li a,div{
+.container ul li a,.logout,.name{
   font-weight: bold;
   color: #2A2F30;
   cursor: pointer;
+}
+
+.name{
+  cursor: inherit;
+  user-select: none;
 }
 
 .container a{

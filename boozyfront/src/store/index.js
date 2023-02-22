@@ -10,7 +10,7 @@ export default createStore({
     },
     plugins:[
         createPersistedState({
-            storage: window.sessionStorage
+            storage: window.sessionStorage,
         })
     ]
 })
