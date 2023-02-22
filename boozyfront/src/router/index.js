@@ -8,6 +8,9 @@ import Main from "@/views/Main"
 import AdminPartiesViewer from "@/views/adminPart/AdminPartiesViewer";
 import AdminPartyInfo from "@/views/adminPart/AdminPartyInfo";
 import Registrate from "@/components/registrate";
+import UserPartiesViewer from "@/views/userPart/UserPartiesViewer";
+import userPartiesViewer from "@/views/userPart/UserPartiesViewer";
+import UserPartyInfo from "@/views/userPart/UserPartyInfo";
 
 const routes = [
     {
@@ -23,7 +26,31 @@ const routes = [
                         path: "",
                         name: "ingredients-and-cocktails",
                         component: UserListsViewer
-                    }
+                    },
+                ]
+            },
+            {
+                path: "parties",
+                name: "",
+                component: UserMainPage,
+                children: [
+                    {
+                        path: "",
+                        name: "",
+                        component: UserPartiesViewer
+                    },
+                ]
+            },
+            {
+                path: "party/:id",
+                name: "userPartyInfo",
+                component: UserMainPage,
+                children: [
+                    {
+                        path: "",
+                        name: "",
+                        component: UserPartyInfo
+                    },
                 ]
             },
             {

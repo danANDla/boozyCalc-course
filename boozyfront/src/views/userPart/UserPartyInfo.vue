@@ -8,11 +8,26 @@
       <div> event time: {{ formatDate(this.party.date) }}</div>
     </div>
 
-    <dialog-window v-model:show="userInfoVisible">
-      <!--      <div class="info-container">-->
-      <!--        <user-info :user="this.currentUser"></user-info>-->
-      <!--      </div>-->
-    </dialog-window>
+    <div class="party-items">
+      <div>YOUR ORDER</div>
+      <div v-if="invitesLoading || usersLoading || groupedOrdersLoading">
+        <pulse-loader :loading="true"></pulse-loader>
+      </div>
+      <div v-else class="order-container">
+        <div class="order-item" v-for="(item, index) in this.personalOrder.items">
+          {{item.name}}
+          x
+          {{item.count}}
+          <div class="price"> = {{Math.ceil(item.price)}}</div>
+        </div>
+        <div class="total">
+          <div>
+            total sum
+          </div>
+          {{Math.ceil(this.personalOrder.total)}}
+        </div>
+      </div>
+    </div>
 
     <div class="party-items">
       <div>INVITES</div>
@@ -24,7 +39,7 @@
                     :users="users"
                     :grouped-orders="groupedOrders"
                     :page="'invites'"
-                    :user-group="1"
+                    :user-group="0"
                     :party_id="this.$route.params.id"
                     @showItem="showUser"
                     @addOrder="addOrder"/>
@@ -34,18 +49,6 @@
     <dialog-window v-model:show="cocktailInfoVisible">
       <div class="info-container">
         <cocktail-info :cocktail="currentCocktail" :party_id="this.$route.params.id"></cocktail-info>
-      </div>
-    </dialog-window>
-
-    <dialog-window v-model:show="addOrderFormVisible">
-      <div class="info-container">
-        <add-order-form :party_id="this.$route.params.id"
-                        :cocktails-loading="this.cocktailsLoading"
-                        :menu="party.menu"
-                        :person="{id: currentUser, name: this.users.find(x => x.id ===currentUser).name}"
-                        :error-text="this.orderAddErrorText"
-                        :is-error="this.orderAddIsError"
-                        @submitData="sendOrder"/>
       </div>
     </dialog-window>
 
@@ -61,47 +64,11 @@
                     :ingredients="ingredients"
                     :page="'menu'"
                     :party_id="this.$route.params.id"
-                    :user-group="1"
+                    :user-group="0"
                     @showItem="showCocktailsInfo"/>
       </div>
     </div>
 
-
-    <dialog-window v-model:show="purchaseDialogVisible">
-      <div class="form-container">
-        <add-purchase-form @submitData="sendPurchase"
-                           @input="this.purchaseAddIsError = false; this.purchaseAddErrorText=''"
-                           :is-error="purchaseAddIsError"
-                           :error-text="purchaseAddErrorText"
-                           :prev-purchase="currentPurchase">
-        </add-purchase-form>
-      </div>
-    </dialog-window>
-
-    <dialog-window v-model:show="purchaseSureVisible">
-      <div class="form-container">
-        <are-you-sure @sure="sure('parties', purchaseSureId)" @notsure="notsure('parties')"> Are you sure you want to
-          delete
-          {{ purchaseSureName }}?
-        </are-you-sure>
-      </div>
-    </dialog-window>
-
-    <div class="party-items">
-      <div>STOCKS</div>
-      <div v-if="stocksLoading || productsLoading">
-        <pulse-loader :loading="true"></pulse-loader>
-      </div>
-      <div v-else class="list-container">
-        <items-list :items="purchases"
-                    :products="products"
-                    :page="'purchases'"
-                    :user-group="1"
-                    @addItem="showPurchaseDialog"
-                    @editItem="showPurchaseEditDialog"
-                    @deleteItem="showSureEdit"/>
-      </div>
-    </div>
   </div>
 
 
@@ -116,10 +83,9 @@ import AddPartyForm from "../../components/partiesViewer/AddPartyForm";
 import AddPurchaseForm from "../../components/partiesViewer/AddPurchaseForm";
 import CocktailInfo from "../../components/listsViewer/CocktailInfo";
 import AddOrderForm from "@/components/listsViewer/AddOrderForm";
-import authHeader from "@/services/auth-header";
 
 export default {
-  name: "AdminPartyInfo",
+  name: "UserPartyInfo",
   components: {AddOrderForm, CocktailInfo, AddPurchaseForm, ItemsList, DialogWindow, AddPartyForm, AreYouSure},
   data() {
     return {
@@ -155,20 +121,18 @@ export default {
       groupedOrders: [],
       groupedOrdersLoading: true,
 
-      purchases: this.$store.state.items.pusrchases,
-      stocksLoading: true,
-      currentPurchase: undefined,
-      purchaseSureVisible: false,
-      purchaseDialogVisible: false,
-      purchaseInfoVisible: false,
-      purchaseSureName: String,
-      purchaseSureId: Number,
-      purchaseAddIsError: false,
-      purchaseAddErrorText: "",
-
       addOrderFormVisible: false,
       orderAddIsError: false,
       orderAddErrorText: "",
+    }
+  },
+  computed: {
+    user() {
+      return this.$store.getters['auth/getUser']
+    },
+    personalOrder() {
+      console.log(this.groupedOrders.find(x => x.person_id === this.user.id))
+      return this.groupedOrders.find(x => x.person_id === this.user.id)
     }
   },
   methods: {
@@ -183,86 +147,6 @@ export default {
     showCocktailsInfo(id) {
       this.currentCocktail = this.cocktails.find(x => x.id === id)
       this.cocktailInfoVisible = true
-    },
-    showPurchaseDialog() {
-      this.currentPurchase = undefined
-      this.purchaseAddIsError = false
-      this.purchaseAddErrorText = ""
-      this.purchaseDialogVisible = true
-    },
-    showPurchaseEditDialog(id) {
-      this.currentPurchase = this.purchases.find(x => x.product_id === id)
-      console.log('current', id, this.currentPurchase)
-      this.purchaseAddIsError = false
-      this.purchaseAddErrorText = ""
-      this.purchaseDialogVisible = true
-    },
-    async sendPurchase(args) {
-      console.log(args)
-      let newPurchase = args.purchase
-      let badNewItem = false
-      if (newPurchase.product_id === undefined) {
-        this.purchaseAddIsError = true
-        badNewItem = true
-        this.purchaseAddErrorText = "product not selected"
-      }
-      if (newPurchase.quantity === "" || newPurchase.quantity === undefined) {
-        this.purchaseAddIsError = true
-        badNewItem = true
-        this.purchaseAddErrorText = "empty quantity field"
-      } else if (newPurchase.quantity < 0) {
-        this.purchaseAddIsError = true
-        badNewItem = true
-        this.purchaseAddErrorText = "quantity value should be above zero"
-      }
-      if (!badNewItem) {
-        let status = false
-        let errorText = ""
-        newPurchase.party_id = parseInt(this.$route.params.id)
-        await axios.post(this.api_url + 'purchases/' + args.url, newPurchase, {headers: authHeader()})
-            .then(function (response) {
-              status = true;
-            })
-            .catch(function (error) {
-              if (error.response) {
-                console.log(error.response.data);
-                errorText = error.response.data
-              } else if (error.request) {
-                console.log(error.request);
-              } else {
-                console.log('Error', error.message);
-              }
-            })
-        if (status === true) {
-          await this.fetchPurchases()
-          this.purchaseDialogVisible = false
-        } else {
-          console.log("is Error")
-          this.purchaseAddIsError = true
-          if (typeof errorText !== 'string') errorText = 'server error'
-          this.purchaseAddErrorText = errorText.substring(0, Math.min(errorText.length, 200))
-        }
-      }
-    },
-    async deletePurchase(id) {
-      const response = await axios.delete(this.api_url + 'purchases?id=' + id)
-      await this.fetchParties()
-    },
-    showSurePurchase(id, name) {
-      this.purchaseSureId = id
-      this.purchaseSureName = name
-      this.purchaseSureVisible = true
-    },
-    sure: function (type, id) {
-      this.deletePurchase(id)
-      this.purchaseSureVisible = false
-      this.partSureId = -1
-      this.purchaseSureName = ""
-    },
-    notsure: function (type) {
-      this.purchaseSureVisible = false
-      this.purchaseSureId = -1
-      this.purchaseSureName = ""
     },
     fetchCocktails() {
       axios
@@ -295,6 +179,7 @@ export default {
           .then(response => {
             this.$store.commit("items/updateUsers", response.data)
             this.users = this.$store.state.items.users
+            // this.users = (this.$store.state.items.users).filter(x => x.id !== this.user.id)
           })
           .catch(error => {
             console.log(error)
@@ -311,19 +196,6 @@ export default {
             console.log(error)
           })
           .finally(() => this.invitesLoading = false)
-    },
-    fetchPurchases() {
-      axios
-          .get(this.api_url + 'purchases/party?id=' + this.$route.params.id)
-          .then(response => {
-            this.purchases = response.data
-            console.log("PURCHASES LOADED")
-            console.log(this.purchases)
-          })
-          .catch(error => {
-            console.log(error)
-          })
-          .finally(() => this.stocksLoading = false)
     },
     getAvailableCocktails() {
       axios
@@ -388,7 +260,7 @@ export default {
       let errorText = ""
       let badNewItem = false
       if (!badNewItem) {
-        await axios.post(this.api_url + 'parties/order', newOrder, {headers: authHeader()})
+        await axios.post(this.api_url + 'parties/order', newOrder)
             .then(function (response) {
               status = true;
               console.log(response.status.valueOf())
@@ -427,7 +299,6 @@ export default {
     this.fetchIngredients()
     this.fetchCocktails()
     this.fetchParties()
-    this.fetchPurchases()
     this.fetchUsers()
     this.fetchInvites()
     this.getAvailableCocktails()
@@ -540,5 +411,33 @@ export default {
 
 .v-spinner {
   text-align: center;
+}
+
+.price{
+  color: #576163;
+}
+
+.order-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.order-item{
+  font-size: x-large;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+}
+.total{
+  display: flex;
+  font-size: x-large;
+  padding: 10px;
+  background-color: #292929;
+}
+.total div{
+  flex-grow: 1;
+  text-align: end;
+  padding-right: 10px;
+  color: #576163;
 }
 </style>
