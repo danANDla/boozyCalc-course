@@ -53,17 +53,11 @@ export default {
     signIn : function(){
       if(this.pass !== "" && this.login !== "" && this.login !== undefined && this.pass !== undefined){
         this.$emit("logIn", this.login, this.pass);
-        document.querySelector('input[type=password]').style.border = "4px solid #ffffff";
-        document.querySelector('input[type=text]').style.border = "4px solid #ffffff";
       }
       else {
         if (this.pass === "" || this.pass === undefined) {
-          console.log("empty");
-          document.querySelector('input[type=password]').style.border = "4px solid #c1364c";
         }
         if(this.login === "" || this.login === undefined){
-          console.log("empty");
-          document.querySelector('input[type=text]').style.border = "4px solid #c1364c";
         }
       }
     },

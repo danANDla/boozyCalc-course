@@ -34,7 +34,7 @@ export default {
       return this.$store.state.auth.status.loggedIn;
     }
   },
-  mounted() {
+  beforeMount() {
     if (!this.loggedIn){
       this.$router.push("/start")
     }

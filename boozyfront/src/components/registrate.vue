@@ -77,8 +77,6 @@ export default {
     signUp: function () {
       if (this.user.pass !== "" && this.user.login !== "" && this.user.realName !== "" &&
           this.user.login !== undefined && this.user.pass !== undefined && this.user.realName !== undefined) {
-        // document.querySelector('input[type=password]').style.border = "4px solid #ffffff";
-        // document.querySelector('input[type=text]').style.border = "4px solid #ffffff";
 
         this.message = ""
         this.loading = true
@@ -100,12 +98,6 @@ export default {
             })
         )
       } else {
-        if (this.user.pass === "" || this.user.pass === undefined) {
-          document.querySelector('input[type=password]').style.border = "4px solid #c1364c";
-        }
-        if (this.user.login === "" || this.user.login === undefined) {
-          document.querySelector('input[type=text]').style.border = "4px solid #c1364c";
-        }
       }
     }
   }

@@ -6,10 +6,8 @@
 
     <ul class="nav">
       <li>
-        <router-link to="/about"> about </router-link>
-      </li>
-      <li>
-        <router-link to="/"> log in </router-link>
+        <router-link v-if="!this.loggedIn"  to="/start"> log in </router-link>
+        <div v-if="this.loggedIn" class="logout" @click="logout"> log out </div>
       </li>
     </ul>
   </div>
@@ -18,8 +16,18 @@
 <script>
 export default {
   name: "BoozyHeader",
-  components: {}
-
+  components: {},
+  computed:{
+    loggedIn(){
+      return this.$store.state.auth.status.loggedIn;
+    }
+  },
+  methods:{
+    logout() {
+      this.$store.dispatch('auth/logout');
+      this.$router.push('/start');
+    },
+  }
 }
 </script>
 
@@ -48,17 +56,19 @@ export default {
   margin-left: 25px;
 }
 
-.container ul li a:hover{
+.container ul li a,div:hover{
   color: #CFE5EE;
 }
 
-.container ul li a{
+.container ul li a,div{
   font-weight: bold;
   color: #2A2F30;
+  cursor: pointer;
 }
 
 .container a{
   color: #2A2F30;
   text-decoration: none;
 }
+
 </style>
