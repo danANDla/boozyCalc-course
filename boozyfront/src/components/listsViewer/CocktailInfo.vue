@@ -86,7 +86,7 @@ export default {
   },
   mounted() {
     this.fetchIngredients()
-    this.getNeededIngredients()
+    if(this.party_id !==undefined) this.getNeededIngredients()
   }
 }
 </script>

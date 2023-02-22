@@ -356,11 +356,9 @@ export default {
       this.cocksSureId = id
       this.cocksSureName = name
       this.cocksSureVisible = true
-      console.log('trying delete ' + id)
     },
     showCocktailsInfo(id) {
       this.cocktailsInfoVisible = true
-      console.log('showCocktailsInfo', id)
       this.currentCocktail = this.cocktails.find(x => x.id === id)
     },
     async sendCocktail(args) {
