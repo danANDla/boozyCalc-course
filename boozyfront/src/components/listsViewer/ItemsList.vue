@@ -46,7 +46,7 @@
 
       <div class="invites-container" v-else-if="page==='invites'">
         <div class="item-name" @click="showItem(item.person_id)">{{
-            users.find(x => x.id === item.person_id).name
+            users.find(x => x.id === item.person_id).realname
           }}
         </div>
         <div class="item-info"  @click="showItem(item.person_id)">

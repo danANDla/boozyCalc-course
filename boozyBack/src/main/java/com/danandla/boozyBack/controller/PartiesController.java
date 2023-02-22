@@ -106,7 +106,7 @@ public class PartiesController {
 
     @GetMapping("/grouped")
     @CrossOrigin(origins = "http://localhost:8081")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole(ERole.)")
     public ResponseEntity getGrouped(@RequestParam Long id) {
         try {
             return ResponseEntity.ok(partyService.getGroupedOrders(id));

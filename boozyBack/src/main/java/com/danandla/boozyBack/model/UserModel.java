@@ -2,9 +2,13 @@ package com.danandla.boozyBack.model;
 
 public class UserModel {
     private Long id;
-    private String name;
+    private String nickname;
+    private String realname;
 
-    public UserModel() {
+    public UserModel(Long id, String nickname, String realname) {
+        this.id = id;
+        this.nickname = nickname;
+        this.realname = realname;
     }
 
     public Long getId() {
@@ -15,11 +19,19 @@ public class UserModel {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
     }
 }

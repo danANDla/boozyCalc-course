@@ -2,6 +2,7 @@ package com.danandla.boozyBack.service;
 
 import com.danandla.boozyBack.entity.UserEntity;
 import com.danandla.boozyBack.exception.ItemNameNotFoundException;
+import com.danandla.boozyBack.model.UserModel;
 import com.danandla.boozyBack.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,13 @@ public class UserService {
     UserRepo userRepo;
 
 
-    public ArrayList<UserEntity> getAllUsers() {
+    public ArrayList<UserModel> getAllUsers() {
         ArrayList<UserEntity> list = (ArrayList<UserEntity>) userRepo.findAll();
-        return list;
+        ArrayList<UserModel> retlist = new ArrayList<UserModel>();
+        for(UserEntity u: list){
+            retlist.add(new UserModel(u.getId(), u.getUserName(), u.getRealName()));
+        }
+        return retlist;
     }
 
     public Long deleteById(Long userId) throws ItemNameNotFoundException {
