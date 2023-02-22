@@ -7,6 +7,7 @@ import UserMainPage from "@/views/userPart/UserMainPage";
 import Main from "@/views/Main"
 import AdminPartiesViewer from "@/views/adminPart/AdminPartiesViewer";
 import AdminPartyInfo from "@/views/adminPart/AdminPartyInfo";
+import Registrate from "@/components/registrate";
 
 const routes = [
     {
@@ -47,10 +48,15 @@ const routes = [
                 ]
             },
             {
-                path: "about",
-                name: "about",
+                path: "start",
+                name: "start",
                 component: WelcomePage
             },
+            {
+                path: "register",
+                name: "Registration",
+                component: Registrate
+            }
         ]
     }
 ]

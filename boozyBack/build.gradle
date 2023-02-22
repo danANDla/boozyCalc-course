@@ -26,6 +26,7 @@ dependencies {
 
 	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 
 	runtimeOnly 'org.postgresql:postgresql'

@@ -29,6 +29,16 @@ import BoozyHeader from "@/components/TheHeader";
 export default {
   name: "BasicTemplate",
   components: {BoozyHeader, RectButton, ItemsGrid, TypedItemSection, NavMenu},
+  computed:{
+    loggedIn(){
+      return this.$store.state.auth.status.loggedIn;
+    }
+  },
+  mounted() {
+    if (!this.loggedIn){
+      this.$router.push("/start")
+    }
+  },
   methods: {}
 }
 </script>

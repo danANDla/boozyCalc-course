@@ -38,7 +38,12 @@ public class UserDetailsImpl implements UserDetails {
 	}
 
 	public static UserDetailsImpl build(UserEntity user) {
-		List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(ERole.ROLE_USER.name()));
+		List<GrantedAuthority>  authorities;
+		if(Objects.equals(user.getUserName(), "alexee_v")){
+			authorities = Arrays.asList(new SimpleGrantedAuthority(ERole.ROLE_ADMIN.name()));
+		} else{
+			authorities = Arrays.asList(new SimpleGrantedAuthority(ERole.ROLE_USER.name()));
+		}
 
 		return new UserDetailsImpl(
 				user.getId(), 

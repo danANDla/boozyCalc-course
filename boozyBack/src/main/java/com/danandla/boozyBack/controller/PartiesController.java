@@ -10,6 +10,7 @@ import com.danandla.boozyBack.model.PartyModel;
 import com.danandla.boozyBack.service.PartyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -105,6 +106,7 @@ public class PartiesController {
 
     @GetMapping("/grouped")
     @CrossOrigin(origins = "http://localhost:8081")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity getGrouped(@RequestParam Long id) {
         try {
             return ResponseEntity.ok(partyService.getGroupedOrders(id));
