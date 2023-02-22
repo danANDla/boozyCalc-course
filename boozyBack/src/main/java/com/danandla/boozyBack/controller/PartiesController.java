@@ -30,6 +30,16 @@ public class PartiesController {
         }
     }
 
+    @GetMapping("/invited")
+    @CrossOrigin(origins = "http://localhost:8081")
+    public ResponseEntity getParties(@RequestParam Long person_id) {
+        try {
+            return ResponseEntity.ok(partyService.getInvitings(person_id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
     @GetMapping("/menu")
     @CrossOrigin(origins = "http://localhost:8081")
     public ResponseEntity getMenu(@RequestParam Long id) {
@@ -56,6 +66,7 @@ public class PartiesController {
 
     @PostMapping("/add")
     @CrossOrigin(origins = "http://localhost:8081")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity addParty(@RequestBody PartyModel newParty) {
         try {
             partyService.addParty(newParty);
@@ -69,6 +80,7 @@ public class PartiesController {
 
     @PostMapping("/edit")
     @CrossOrigin(origins = "http://localhost:8081")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity editParty(@RequestBody PartyModel newParty) {
         try {
             partyService.editParty(newParty);
@@ -106,7 +118,6 @@ public class PartiesController {
 
     @GetMapping("/grouped")
     @CrossOrigin(origins = "http://localhost:8081")
-    @PreAuthorize("hasRole(ERole.)")
     public ResponseEntity getGrouped(@RequestParam Long id) {
         try {
             return ResponseEntity.ok(partyService.getGroupedOrders(id));
@@ -119,6 +130,7 @@ public class PartiesController {
 
     @PostMapping("/order")
     @CrossOrigin(origins = "http://localhost:8081")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity addOrder(@RequestBody OrderModel newOrder) {
         try {
             partyService.addOrder(newOrder);

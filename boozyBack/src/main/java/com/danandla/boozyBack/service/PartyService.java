@@ -47,8 +47,7 @@ public class PartyService {
     @Autowired
     OrderJpaRepo orderRepoAdd;
 
-    public ArrayList<PartyModel> getAllParties() {
-        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
+    private ArrayList<PartyModel> fillPartyModelList(List<PartyEntity> list){
         ArrayList<PartyModel> retList = new ArrayList<>();
         for (PartyEntity i : list) {
             List<MenuEntity> recipe = menuRepo.findByPartId(i.getId());
@@ -66,6 +65,16 @@ public class PartyService {
             retList.add(party);
         }
         return retList;
+    }
+
+    public ArrayList<PartyModel> getAllParties() {
+        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSorted();
+        return fillPartyModelList(list);
+    }
+
+    public ArrayList<PartyModel> getInvitings(Long person_id) {
+        List<PartyEntity> list = (List<PartyEntity>) partiesRepo.findAllDateSortedForPerson(person_id);
+        return fillPartyModelList(list);
     }
 
     public Long deleteById(Long partyId) throws ItemNameNotFoundException {

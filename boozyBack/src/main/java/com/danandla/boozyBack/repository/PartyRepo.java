@@ -13,4 +13,7 @@ public interface PartyRepo extends CrudRepository<PartyEntity, Long> {
 
     @Query(value = "SELECT * FROM PARTIES ORDER BY parties.event_date DESC", nativeQuery = true)
     List<PartyEntity> findAllDateSorted();
+
+    @Query(value = "SELECT parties.* FROM PARTIES join invites on invites.party_id = parties.id where invites.person_id = ?1 ORDER BY parties.event_date DESC;", nativeQuery = true)
+    List<PartyEntity> findAllDateSortedForPerson(Long p_id);
 }
